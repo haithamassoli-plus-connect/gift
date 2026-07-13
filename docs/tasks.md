@@ -6,14 +6,14 @@ Execution plan for [PRD.md](PRD.md). Milestones are sequential; each ends demons
 
 **Done:** on a phone-size viewport, create a rose gift, open its link, unwrap it, watch the sender status flip to "Opened ✓" live.
 
-- [ ] Read `convex/_generated/ai/guidelines.md`, then install deps: `three`, `@react-three/fiber`, `@react-three/drei`, `react-router`
-- [ ] Convex schema: `gifts` table with `by_slug` + `by_statusKey` indexes per PRD
-- [ ] `createGift` mutation: validate giftType against registry, variant keys/values, length caps (names ≤40, message ≤280); generate random `slug` + `statusKey`
-- [ ] `getGift` query (public fields only, never `statusKey`), `markOpened` mutation (first open only), `getStatus` query (reactive `openedAt` + slug)
-- [ ] Gift registry: `GiftDef` interface per PRD, registry map, lazy-loaded `Scene` modules
-- [ ] `eternal-rose` gift: all four phases (preview / sealed / opening / revealed), dome-lift unwrap, petal-by-petal bloom, light motes, 3 petal-color variants
-- [ ] Minimal pages for all four routes: `/`, `/create/:giftType`, `/sent/:statusKey`, `/g/:slug`
-- [ ] Wire flow: create → redirect to sent page → open share link → tap-to-unwrap → `markOpened` → status updates live
+- [x] Read `convex/_generated/ai/guidelines.md`, then install deps: `three`, `@react-three/fiber`, `@react-three/drei`, `react-router`
+- [x] Convex schema: `gifts` table with `by_slug` + `by_statusKey` indexes per PRD
+- [x] `createGift` mutation: validate giftType against registry, variant keys/values, length caps (names ≤40, message ≤280); generate random `slug` + `statusKey`
+- [x] `getGift` query (public fields only, never `statusKey`), `markOpened` mutation (first open only), `getStatus` query (reactive `openedAt` + slug)
+- [x] Gift registry: `GiftDef` interface per PRD, registry map, lazy-loaded `Scene` modules
+- [x] `eternal-rose` gift: all four phases (preview / sealed / opening / revealed), dome-lift unwrap, petal-by-petal bloom, light motes, 3 petal-color variants
+- [x] Minimal pages for all four routes: `/`, `/create/:giftType`, `/sent/:statusKey`, `/g/:slug`
+- [x] Wire flow: create → redirect to sent page → open share link → tap-to-unwrap → `markOpened` → status updates live
 
 ## M2 — Sender & recipient UX
 

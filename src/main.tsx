@@ -1,10 +1,26 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { BrowserRouter, Route, Routes } from "react-router";
+import "./index.css";
+import Home from "./pages/Home";
+import Create from "./pages/Create";
+import Sent from "./pages/Sent";
+import GiftView from "./pages/GiftView";
 
-createRoot(document.getElementById('root')!).render(
+const client = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
+
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <ConvexProvider client={client}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/create/:giftType" element={<Create />} />
+          <Route path="/sent/:statusKey" element={<Sent />} />
+          <Route path="/g/:slug" element={<GiftView />} />
+        </Routes>
+      </BrowserRouter>
+    </ConvexProvider>
   </StrictMode>,
-)
+);

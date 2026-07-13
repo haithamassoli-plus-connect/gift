@@ -1,2 +1,16 @@
 @import "tailwindcss";
 
+@theme {
+  --font-display: "Georgia", "Times New Roman", serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-[#100b14] text-stone-200 antialiased;
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
