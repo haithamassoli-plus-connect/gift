@@ -27,7 +27,7 @@ const PALETTES: Record<
 > = {
   red: { petal: "#b81f3f", deep: "#6e0d22", emissive: "#2a030c", mote: "#ffca9b", metalness: 0.05, roughness: 0.55 },
   white: { petal: "#f3ead9", deep: "#c9b696", emissive: "#181410", mote: "#fdf3c0", metalness: 0.02, roughness: 0.6 },
-  "midnight-gold": { petal: "#2a2b52", deep: "#14152e", emissive: "#4a3a0a", mote: "#ffd76a", metalness: 0.4, roughness: 0.4 },
+  "midnight-gold": { petal: "#343767", deep: "#181a38", emissive: "#7a5c10", mote: "#ffd76a", metalness: 0.5, roughness: 0.35 },
 };
 
 /* ---------- procedural petal geometry (shared by petals, sepals, leaves) ---------- */

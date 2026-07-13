@@ -93,6 +93,21 @@ export default function Create() {
       {def.variants.map((variant) => (
         <div key={variant.key}>
           <p className="mb-2 text-sm font-medium text-stone-300">{variant.label}</p>
+          {variant.options.length > 6 ? (
+            <select
+              value={variants[variant.key]}
+              onChange={(e) =>
+                setVariants((prev) => ({ ...prev, [variant.key]: e.target.value }))
+              }
+              className={`${inputClass} appearance-none`}
+            >
+              {variant.options.map((option) => (
+                <option key={option.value} value={option.value} className="bg-[#100b14]">
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          ) : (
           <div className="flex flex-wrap gap-2">
             {variant.options.map((option) => {
               const selected = variants[variant.key] === option.value;
@@ -115,6 +130,7 @@ export default function Create() {
               );
             })}
           </div>
+          )}
         </div>
       ))}
 

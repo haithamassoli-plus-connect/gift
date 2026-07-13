@@ -5,11 +5,15 @@ import type { GiftPhase } from "./types";
  * Shared opening-timeline plumbing for gift scenes: a clock that resets when
  * the phase flips to "opening", plus a once-only completion latch.
  *
+ * IMPORTANT: destructure with Ref-suffixed names or the react-hooks lint
+ * rejects the mutations (it recognizes refs by name):
+ *   const { t: tRef, done: doneRef } = useOpeningClock(phase);
+ *
  * In useFrame:
- *   if (phase === "opening") t.current += Math.min(delta, 0.05);
+ *   if (phase === "opening") tRef.current += Math.min(delta, 0.05);
  *   ...
- *   if (phase === "opening" && t.current > END && !done.current) {
- *     done.current = true; onOpenComplete?.();
+ *   if (phase === "opening" && tRef.current > END && !doneRef.current) {
+ *     doneRef.current = true; onOpenComplete?.();
  *   }
  */
 export function useOpeningClock(phase: GiftPhase) {

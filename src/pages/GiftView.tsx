@@ -109,10 +109,12 @@ export default function GiftView() {
 
         {phase === "sealed" && (
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-transparent to-[#100b14]/80 p-6 text-center">
-            <h1 className="font-serif text-4xl text-stone-100">
+            <h1 className="font-serif text-4xl text-stone-100 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
               A gift for {gift.recipientName}
             </h1>
-            <p className="text-stone-400">from {gift.senderName}</p>
+            <p className="text-stone-300 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)]">
+              from {gift.senderName}
+            </p>
             <button
               type="button"
               onClick={unwrap}

@@ -29,18 +29,18 @@ Execution plan for [PRD.md](PRD.md). Milestones are sequential; each ends demons
 
 **Done:** all 12 gifts live, each implementing the same phase/variant contract. Spec for each = PRD catalog table (sealed/unwrap, main animation, variants). Riskiest first.
 
-- [ ] `fireworks` — bursts must legibly spell the message (hardest: text from particles); tap launches extras
-- [ ] `snow-globe` — drag-to-shake gesture drives particle swirl
-- [ ] `birthday-cake` — per-flame tap targets to blow out candles; confetti burst; candle count 1–24
-- [ ] `constellation` — stars connect into heart / star / infinity; shimmer text
-- [ ] `butterfly-jar` — lid unscrews; glowing swarm forms the message
-- [ ] `lantern-sky` — lanterns rise carrying message letters
-- [ ] `balloon-bunch` — inflate, lift message tag; palette + count variants
-- [ ] `message-bottle` — shore waves, cork pop, parchment unroll
-- [ ] `music-box` — lid opens, figurine spins; WebAudio chime loop (starts on tap)
-- [ ] `golden-locket` — unclasp, open to engraved names; metal variants
-- [ ] `aurora` — shader ribbons over snowfield; message glows within
-- [ ] Registry/gallery updated as each lands; every gift verified in all four phases + both viewports
+- [x] `fireworks` — bursts must legibly spell the message (hardest: text from particles); tap launches extras
+- [x] `snow-globe` — drag-to-shake gesture drives particle swirl
+- [x] `birthday-cake` — per-flame tap targets to blow out candles; confetti burst; candle count 1–24
+- [x] `constellation` — stars connect into heart / star / infinity; shimmer text
+- [x] `butterfly-jar` — lid unscrews; glowing swarm forms the message
+- [x] `lantern-sky` — lanterns rise carrying message letters
+- [x] `balloon-bunch` — inflate, lift message tag; palette + count variants
+- [x] `message-bottle` — shore waves, cork pop, parchment unroll
+- [x] `music-box` — lid opens, figurine spins; WebAudio chime loop (starts on tap)
+- [x] `golden-locket` — unclasp, open to engraved names; metal variants
+- [x] `aurora` — shader ribbons over snowfield; message glows within
+- [x] Registry/gallery updated as each lands; every gift verified in all four phases + both viewports
 
 ## M4 — Hardening
 
