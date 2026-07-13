@@ -77,6 +77,15 @@ function makeCandleTexture(): THREE.CanvasTexture {
 }
 const candleTex = makeCandleTexture();
 
+// Shared across all 24 candles — per-candle inline materials/geometries would
+// create ~120 duplicate GPU objects.
+const candleBodyGeo = new THREE.CylinderGeometry(0.045, 0.05, CANDLE_H, 12);
+const candleBodyMat = new THREE.MeshStandardMaterial({ map: candleTex, roughness: 0.5 });
+const wickGeo = new THREE.CylinderGeometry(0.008, 0.008, 0.05, 6);
+const wickMat = new THREE.MeshStandardMaterial({ color: "#2a2320", roughness: 0.9 });
+const hitGeo = new THREE.SphereGeometry(0.28, 8, 8);
+const hitMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false });
+
 // confetti per-instance kinematics (deterministic).
 function buildConfetti() {
   const rand = mulberry32(4242);
@@ -656,14 +665,8 @@ export default function BirthdayCakeScene({
         {/* candles */}
         {candles.map((c, i) => (
           <group key={i} position={[c.x, 0, c.z]}>
-            <mesh position={[0, 0.23, 0]}>
-              <cylinderGeometry args={[0.045, 0.05, CANDLE_H, 12]} />
-              <meshStandardMaterial map={candleTex} roughness={0.5} />
-            </mesh>
-            <mesh position={[0, 0.55, 0]}>
-              <cylinderGeometry args={[0.008, 0.008, 0.05, 6]} />
-              <meshStandardMaterial color="#2a2320" roughness={0.9} />
-            </mesh>
+            <mesh position={[0, 0.23, 0]} geometry={candleBodyGeo} material={candleBodyMat} />
+            <mesh position={[0, 0.55, 0]} geometry={wickGeo} material={wickMat} />
             <group
               ref={(el) => {
                 flameRefs.current[i] = el;
@@ -678,14 +681,13 @@ export default function BirthdayCakeScene({
                 hitRefs.current[i] = el;
               }}
               position={[0, FLAME_Y, 0]}
+              geometry={hitGeo}
+              material={hitMat}
               onPointerDown={(e) => {
                 e.stopPropagation();
                 blowOut(i);
               }}
-            >
-              <sphereGeometry args={[0.28, 8, 8]} />
-              <meshBasicMaterial transparent opacity={0} depthWrite={false} />
-            </mesh>
+            />
           </group>
         ))}
 

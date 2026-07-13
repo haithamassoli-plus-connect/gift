@@ -46,12 +46,12 @@ Execution plan for [PRD.md](PRD.md). Milestones are sequential; each ends demons
 
 **Done:** smooth on a mid-range phone, accessible, no dead weight.
 
-- [ ] `prefers-reduced-motion`: shared wrapper skips straight to static `revealed` phase
-- [ ] Perf pass: DPR capped at 2, 60fps target on mid phone, rendering paused when tab hidden or canvas offscreen
-- [ ] Audio only after user gesture (music-box, fireworks); no autoplay errors in console
-- [ ] Code-splitting verified: opening one gift loads only that gift's module (check network tab)
-- [ ] Static OG tags: "Someone made you a gift 🎁"
-- [ ] Sweep all 12 gifts on small-phone portrait + desktop: text legible, tap targets reachable, no clipping
+- [x] `prefers-reduced-motion`: shared wrapper skips straight to static `revealed` phase
+- [x] Perf pass: DPR capped at 2, 60fps target on mid phone, rendering paused when tab hidden or canvas offscreen
+- [x] Audio only after user gesture (music-box, fireworks); no autoplay errors in console
+- [x] Code-splitting verified: opening one gift loads only that gift's module (check network tab)
+- [x] Static OG tags: "Someone made you a gift 🎁"
+- [x] Sweep all 12 gifts on small-phone portrait + desktop: text legible, tap targets reachable, no clipping
 
 ## M5 — Ship
 

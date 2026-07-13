@@ -376,6 +376,7 @@ export default function MessageBottleScene({
   const glintSpriteMatRef = useRef<THREE.MeshBasicMaterial>(null);
   const warmRef = useRef<THREE.PointLight>(null);
   const frameRef = useRef(0);
+  const lastRollRef = useRef(-1);
 
   const { t: tRef, done: doneRef } = useOpeningClock(phase);
 
@@ -385,16 +386,20 @@ export default function MessageBottleScene({
     if (phase === "opening") tRef.current += dt;
     const t = tRef.current;
 
-    /* --- sea surface waves (normals every other frame) --- */
+    /* --- sea surface waves --- */
+    // ponytail: vertex + normal updates throttled (waves 30Hz, normals 15Hz) —
+    // computeVertexNormals over 1.7k verts is the priciest per-frame op here.
     const sea = seaRef.current;
     if (sea) {
-      const sp = sea.geometry.attributes.position;
-      for (let i = 0; i < sp.count; i++) {
-        sp.setZ(i, waveHeight(sp.getX(i), sp.getY(i), el));
-      }
-      sp.needsUpdate = true;
       frameRef.current++;
-      if (frameRef.current % 2 === 0) sea.geometry.computeVertexNormals();
+      if (frameRef.current % 2 === 0) {
+        const sp = sea.geometry.attributes.position;
+        for (let i = 0; i < sp.count; i++) {
+          sp.setZ(i, waveHeight(sp.getX(i), sp.getY(i), el));
+        }
+        sp.needsUpdate = true;
+        if (frameRef.current % 4 === 0) sea.geometry.computeVertexNormals();
+      }
     }
 
     /* --- glints ride the swell + twinkle --- */
@@ -506,7 +511,10 @@ export default function MessageBottleScene({
       pg.rotation.z = tiltZ;
     }
     const pgeo = parchSheetRef.current?.geometry;
-    if (show && pgeo) {
+    // Only reshape while the roll progress actually changes; the sheet is
+    // unlit (MeshBasicMaterial) so normals never need recomputing.
+    if (show && pgeo && p !== lastRollRef.current) {
+      lastRollRef.current = p;
       const pa = pgeo.attributes.position;
       const L = parch.L;
       const R = parch.R;
@@ -521,7 +529,6 @@ export default function MessageBottleScene({
         }
       }
       pa.needsUpdate = true;
-      pgeo.computeVertexNormals();
     }
 
     /* --- warm light pulse + glass glint pulse --- */

@@ -14,7 +14,7 @@ function useInView<T extends Element>() {
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => setInView(entry.isIntersecting),
-      { threshold: 0.15, rootMargin: "100px" },
+      { threshold: 0.15, rootMargin: "0px" },
     );
     observer.observe(el);
     return () => observer.disconnect();

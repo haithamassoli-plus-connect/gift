@@ -199,7 +199,45 @@ function burstText(sim: Sim, palette: Palette, word: string, x: number, y: numbe
   }
 }
 
-function stepRockets(sim: Sim, palette: Palette) {
+/* ---------- sound: soft procedural boom, created only after a user gesture ---------- */
+interface Boom {
+  ctx: AudioContext;
+  master: GainNode;
+  noise: AudioBuffer;
+}
+
+function createBoom(): Boom {
+  const ctx = new AudioContext();
+  const master = ctx.createGain();
+  master.gain.value = 0.07;
+  master.connect(ctx.destination);
+  const noise = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+  const data = noise.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  return { ctx, master, noise };
+}
+
+function playBoom({ ctx, master, noise }: Boom, big: boolean) {
+  if (ctx.state === "suspended") void ctx.resume();
+  const t = ctx.currentTime;
+  const dur = big ? 1.1 : 0.7;
+  const src = ctx.createBufferSource();
+  src.buffer = noise;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(big ? 1 : 0.5, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  const lp = ctx.createBiquadFilter();
+  lp.type = "lowpass";
+  lp.frequency.setValueAtTime(big ? 800 : 1300, t);
+  lp.frequency.exponentialRampToValueAtTime(120, t + dur);
+  src.connect(lp);
+  lp.connect(gain);
+  gain.connect(master);
+  src.start(t);
+  src.stop(t + dur + 0.1);
+}
+
+function stepRockets(sim: Sim, palette: Palette, boom?: (big: boolean) => void) {
   const { pool } = sim;
   const alive: Rocket[] = [];
   for (const rk of sim.rockets) {
@@ -222,8 +260,13 @@ function stepRockets(sim: Sim, palette: Palette) {
     }
     if (pool.py[i] >= rk.targetY) {
       pool.mode[i] = DEAD;
-      if (rk.payload.kind === "sphere") burstSphere(sim, palette, pool.px[i], pool.py[i], true);
-      else burstText(sim, palette, rk.payload.word, pool.px[i], pool.py[i]);
+      if (rk.payload.kind === "sphere") {
+        burstSphere(sim, palette, pool.px[i], pool.py[i], true);
+        boom?.(true);
+      } else {
+        burstText(sim, palette, rk.payload.word, pool.px[i], pool.py[i]);
+        boom?.(false);
+      }
     } else {
       alive.push(rk);
     }
@@ -335,6 +378,7 @@ export default function FireworksScene({
   const { t: tRef, done: doneRef } = useOpeningClock(phase);
 
   const simRef = useRef<Sim | null>(null);
+  const soundRef = useRef<Boom | null>(null);
   const mainPts = useRef<THREE.Points>(null);
   const mirrorPts = useRef<THREE.Points>(null);
   const starMatA = useRef<THREE.PointsMaterial>(null);
@@ -367,6 +411,14 @@ export default function FireworksScene({
       simRef.current.eventCursor = 0;
     }
   }, [phase]);
+
+  useEffect(
+    () => () => {
+      void soundRef.current?.ctx.close();
+      soundRef.current = null;
+    },
+    [],
+  );
 
   useFrame((state, delta) => {
     const sim = (simRef.current ??= {
@@ -411,7 +463,18 @@ export default function FireworksScene({
       }
     }
 
-    stepRockets(sim, palette);
+    // Sound only after the unwrap tap (sticky activation) — previews stay silent.
+    const canSound = phase === "opening" || phase === "revealed";
+    stepRockets(
+      sim,
+      palette,
+      canSound
+        ? (big) => {
+            soundRef.current ??= createBoom();
+            playBoom(soundRef.current, big);
+          }
+        : undefined,
+    );
 
     const geo = mainPts.current?.geometry;
     if (geo) {

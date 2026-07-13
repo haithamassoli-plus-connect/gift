@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { GiftCanvas } from "../components/GiftCanvas";
+import { usePrefersReducedMotion } from "../components/usePrefersReducedMotion";
 import { registry } from "../gifts/registry";
 import Loading from "../components/Loading";
 import NotFound from "./NotFound";
@@ -18,7 +19,7 @@ function RevealedMessage({
 }: {
   message: string;
   senderName: string;
-  onReplay: () => void;
+  onReplay?: () => void;
 }) {
   const [shown, setShown] = useState(false);
   useEffect(() => {
@@ -36,13 +37,15 @@ function RevealedMessage({
         {message}
       </p>
       <p className="mt-4 text-stone-400">— {senderName}</p>
-      <button
-        type="button"
-        onClick={onReplay}
-        className="mt-8 min-h-[48px] rounded-full border border-white/15 px-6 text-sm text-stone-300 transition hover:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
-      >
-        Replay
-      </button>
+      {onReplay && (
+        <button
+          type="button"
+          onClick={onReplay}
+          className="mt-8 min-h-[48px] rounded-full border border-white/15 px-6 text-sm text-stone-300 transition hover:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+        >
+          Replay
+        </button>
+      )}
       <Link
         to="/"
         className="mt-6 block text-sm text-stone-500 underline-offset-4 transition hover:text-stone-300 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
@@ -58,6 +61,7 @@ export default function GiftView() {
   const gift = useQuery(api.gifts.getGift, slug ? { slug } : "skip");
   const markOpened = useMutation(api.gifts.markOpened);
   const [phase, setPhase] = useState<Phase>("sealed");
+  const reducedMotion = usePrefersReducedMotion();
 
   if (gift === undefined) {
     return <Loading />;
@@ -84,7 +88,8 @@ export default function GiftView() {
   }
 
   const unwrap = () => {
-    setPhase("opening");
+    // Reduced motion: skip the opening animation, go straight to the reveal.
+    setPhase(reducedMotion ? "revealed" : "opening");
     if (slug) void markOpened({ slug });
   };
 
@@ -130,7 +135,7 @@ export default function GiftView() {
         <RevealedMessage
           message={gift.message}
           senderName={gift.senderName}
-          onReplay={() => setPhase("opening")}
+          onReplay={reducedMotion ? undefined : () => setPhase("opening")}
         />
       )}
     </div>
