@@ -1,9 +1,9 @@
 // Entry module, not a fast-refresh boundary — the lazy route components live here.
 /* eslint-disable react-refresh/only-export-components */
-import { StrictMode, Suspense, lazy } from "react";
+import { StrictMode, Suspense, lazy, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import "./index.css";
 import { LangProvider } from "./i18n";
 import Loading from "./components/Loading";
@@ -18,10 +18,24 @@ const GiftView = lazy(() => import("./pages/GiftView"));
 
 const client = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
+// ponytail: react-router's <ScrollRestoration /> only works under a data router,
+// and this app is on <BrowserRouter> — not worth a router rewrite for a reset.
+// Restoring scroll on back/forward would need that migration.
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  // Braces are load-bearing: scrollTo returns a Promise in current Chrome (typed
+  // void), and an implicit return hands it to useEffect as a cleanup — which throws.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ConvexProvider client={client}>
       <BrowserRouter>
+        <ScrollToTop />
         <LangProvider>
           <Suspense fallback={<Loading />}>
             <Routes>
