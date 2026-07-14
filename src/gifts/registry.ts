@@ -5,6 +5,7 @@ import type { GiftDef } from "./types";
 // One lazy() entry per gift keeps each scene in its own code-split chunk.
 const scenes = {
   "eternal-rose": lazy(() => import("./eternal-rose/Scene")),
+  moonflower: lazy(() => import("./moonflower/Scene")),
   fireworks: lazy(() => import("./fireworks/Scene")),
   "snow-globe": lazy(() => import("./snow-globe/Scene")),
   "birthday-cake": lazy(() => import("./birthday-cake/Scene")),

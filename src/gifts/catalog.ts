@@ -51,6 +51,25 @@ export const catalog: Record<string, GiftCatalogEntry> = {
       },
     ],
   },
+  moonflower: {
+    id: "moonflower",
+    name: "Moonflower",
+    nameAr: "زهرة القمر",
+    tagline: "A night-blooming flower that opens only for them",
+    taglineAr: "زهرة ليلية تتفتّح من أجلهم وحدهم",
+    variants: [
+      {
+        key: "petal",
+        label: "Petal color",
+        labelAr: "لون البتلات",
+        options: opts(
+          ["moonlight", "Moonlight", "ضوء القمر"],
+          ["blush", "Blush", "وردي"],
+          ["violet", "Violet", "بنفسجي"],
+        ),
+      },
+    ],
+  },
   fireworks: {
     id: "fireworks",
     name: "Fireworks",
