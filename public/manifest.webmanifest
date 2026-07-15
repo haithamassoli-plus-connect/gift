@@ -1,0 +1,19 @@
+{
+  "name": "Gift — a 3D gift you send as a link",
+  "short_name": "Gift",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#100b14",
+  "theme_color": "#100b14",
+  "description": "Make a beautiful animated 3D gift and send it as a link. Free, no accounts.",
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    { "src": "/pwa-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/pwa-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/pwa-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
