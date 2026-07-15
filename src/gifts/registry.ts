@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { catalog } from "./catalog";
+import { catalog, occasionsById } from "./catalog";
 import type { GiftDef } from "./types";
 
 // One lazy() entry per gift keeps each scene in its own code-split chunk.
@@ -44,3 +44,9 @@ const scenes = {
 export const registry: Record<string, GiftDef> = Object.fromEntries(
   Object.entries(scenes).map(([id, Scene]) => [id, { ...catalog[id], Scene }]),
 );
+
+// Dev-only: an untagged scene drops out of every occasion filter (still in "All").
+if (import.meta.env.DEV) {
+  const untagged = Object.keys(catalog).filter((id) => !occasionsById[id]?.length);
+  if (untagged.length) console.warn(`[gifts] untagged scenes: ${untagged.join(", ")}`);
+}

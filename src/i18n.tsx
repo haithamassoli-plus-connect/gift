@@ -20,6 +20,8 @@ const en = {
   home: {
     title: "Gift",
     subtitle: "Beautiful 3D gifts you send as a link. Free, no accounts.",
+    all: "All",
+    filterLabel: "Filter by occasion",
   },
   create: {
     back: "← All gifts",
@@ -75,6 +77,8 @@ const ar: Strings = {
   home: {
     title: "هدية",
     subtitle: "هدايا ثلاثية الأبعاد تُرسلها برابط. مجانًا، دون حسابات.",
+    all: "الكل",
+    filterLabel: "تصفية حسب المناسبة",
   },
   create: {
     back: "→ كل الهدايا",

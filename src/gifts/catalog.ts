@@ -31,6 +31,28 @@ const opts = (...triples: [string, string, string?][]) =>
 export const defaultVariants = (def: GiftCatalogEntry): Record<string, string> =>
   Object.fromEntries(def.variants.map((v) => [v.key, v.options[0].value]));
 
+// What you're sending someone *for* — the browse-by-intent layer over the same
+// scenes. A scene can suit several. Ordered for the gallery filter; the UI
+// prepends an implicit "All".
+export type Occasion =
+  | "love"
+  | "birthday"
+  | "celebration"
+  | "congrats"
+  | "thanks"
+  | "apology"
+  | "thinking-of-you";
+
+export const occasions: { key: Occasion; label: string; labelAr: string }[] = [
+  { key: "love", label: "Love", labelAr: "حب" },
+  { key: "birthday", label: "Birthday", labelAr: "عيد ميلاد" },
+  { key: "celebration", label: "Eid & celebration", labelAr: "عيد ومناسبة" },
+  { key: "congrats", label: "Congrats", labelAr: "تهنئة" },
+  { key: "thanks", label: "Thank you", labelAr: "شكرًا" },
+  { key: "apology", label: "Sorry", labelAr: "اعتذار" },
+  { key: "thinking-of-you", label: "Thinking of you", labelAr: "أفكّر بك" },
+];
+
 export const catalog: Record<string, GiftCatalogEntry> = {
   // ---- Batch 3: the recipient is the maker (dip, stitch, light, pluck, stamp) ----
   qalam: {
@@ -864,4 +886,44 @@ export const catalog: Record<string, GiftCatalogEntry> = {
       },
     ],
   },
+};
+
+// Occasion tags per scene — one editable block instead of a field scattered
+// across 34 entries. Every catalog id must appear with ≥1 occasion, or the
+// scene shows only under "All" (registry.ts warns in dev if one is missed).
+export const occasionsById: Record<string, Occasion[]> = {
+  qalam: ["thanks", "love"],
+  tatreez: ["thanks", "love"],
+  fanous: ["celebration"],
+  "neon-sign": ["love", "thinking-of-you"],
+  typewriter: ["apology", "thinking-of-you"],
+  "domino-run": ["congrats"],
+  oud: ["love", "thanks", "celebration"],
+  "wax-seal": ["apology", "love"],
+  hourglass: ["apology", "thinking-of-you"],
+  falcon: ["congrats", "thinking-of-you"],
+  "eternal-rose": ["love"],
+  moonflower: ["love"],
+  fireworks: ["celebration", "congrats", "birthday"],
+  "snow-globe": ["thinking-of-you"],
+  "birthday-cake": ["birthday"],
+  constellation: ["love", "thinking-of-you"],
+  "butterfly-jar": ["thinking-of-you"],
+  "lantern-sky": ["celebration", "love"],
+  "balloon-bunch": ["birthday", "congrats"],
+  "message-bottle": ["love", "apology"],
+  "music-box": ["love"],
+  "golden-locket": ["love"],
+  "shooting-gallery": ["birthday", "thinking-of-you"],
+  "magic-lamp": ["thinking-of-you", "birthday"],
+  "foggy-mirror": ["love", "apology"],
+  astrolabe: ["thinking-of-you", "congrats"],
+  "scratch-card": ["congrats", "birthday"],
+  "claw-machine": ["birthday", "love"],
+  pinata: ["birthday", "celebration"],
+  mixtape: ["love", "thinking-of-you"],
+  matchbox: ["thinking-of-you"],
+  "koi-pond": ["love", "thinking-of-you"],
+  "cup-reading": ["thinking-of-you", "love"],
+  aurora: ["love", "thinking-of-you"],
 };
