@@ -14,6 +14,7 @@ export default function Sent() {
   );
   const { lang, t } = useLang();
   const [copied, setCopied] = useState(false);
+  const [now] = useState(() => Date.now());
 
   if (status === undefined) {
     return <Loading />;
@@ -79,7 +80,19 @@ export default function Sent() {
             </span>
           </p>
         ) : (
-          <p className="text-sm text-stone-500">{t.sent.notOpened}</p>
+          <>
+            <p className="text-sm text-stone-500">{t.sent.notOpened}</p>
+            {status.openAfter != null && status.openAfter > now ? (
+              <p className="mt-1 text-xs text-stone-500">
+                {t.gift.opensOn(
+                  new Date(status.openAfter).toLocaleString(lang, {
+                    dateStyle: "full",
+                    timeStyle: "short",
+                  }),
+                )}
+              </p>
+            ) : null}
+          </>
         )}
       </div>
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -6,11 +6,69 @@ import { GiftCanvas } from "../components/GiftCanvas";
 import { usePrefersReducedMotion } from "../components/usePrefersReducedMotion";
 import { registry } from "../gifts/registry";
 import { useArabicFontReady } from "../gifts/useArabicFontReady";
-import { strings } from "../i18n";
+import { strings, type Lang } from "../i18n";
 import Loading from "../components/Loading";
 import NotFound from "./NotFound";
 
 type Phase = "sealed" | "opening" | "revealed";
+
+// Largest-unit relative countdown ("in 3 days" … "in 45 seconds"), fully localized.
+function formatCountdown(ms: number, lang: Lang): string {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  const rtf = new Intl.RelativeTimeFormat(lang, { numeric: "always" });
+  if (s < 60) return rtf.format(s, "second");
+  if (s < 3600) return rtf.format(Math.floor(s / 60), "minute");
+  if (s < 86400) return rtf.format(Math.floor(s / 3600), "hour");
+  return rtf.format(Math.floor(s / 86400), "day");
+}
+
+// Ticks once a second in isolation so the countdown re-renders without touching
+// the canvas; calls onUnlock (idempotent) the moment the clock reaches openAfter.
+function LockedSeal({
+  openAfter,
+  lang,
+  opensOnLabel,
+  onUnlock,
+}: {
+  openAfter: number;
+  lang: Lang;
+  opensOnLabel: (date: string) => string;
+  onUnlock: () => void;
+}) {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (Date.now() >= openAfter) {
+      onUnlock();
+      return;
+    }
+    const id = setInterval(() => {
+      if (Date.now() >= openAfter) onUnlock();
+      else setNow(Date.now());
+    }, 1000);
+    return () => clearInterval(id);
+  }, [openAfter, onUnlock]);
+
+  const dateLabel = useMemo(
+    () =>
+      new Date(openAfter).toLocaleString(lang, {
+        dateStyle: "full",
+        timeStyle: "short",
+      }),
+    [openAfter, lang],
+  );
+
+  return (
+    <div className="mt-6 flex flex-col items-center gap-1">
+      <p className="font-serif text-2xl tabular-nums text-stone-100 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)]">
+        {formatCountdown(openAfter - now, lang)}
+      </p>
+      <p className="text-sm text-stone-400 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)]">
+        {opensOnLabel(dateLabel)}
+      </p>
+    </div>
+  );
+}
 
 // Mounts hidden, then flips to visible on the next frame so the block fades in.
 // Replaying unmounts this block, so the fade replays cleanly on the next reveal.
@@ -67,6 +125,12 @@ export default function GiftView() {
   const gift = useQuery(api.gifts.getGift, slug ? { slug } : "skip");
   const markOpened = useMutation(api.gifts.markOpened);
   const [phase, setPhase] = useState<Phase>("sealed");
+  // Captured once at mount — deriving `locked` from a fresh Date.now() during
+  // render is impure; the lock only ever flips locked→unlocked, so a mount
+  // snapshot plus LockedSeal's own timer is enough.
+  const [mountNow] = useState(() => Date.now());
+  const [unlockedNow, setUnlockedNow] = useState(false);
+  const unlock = useCallback(() => setUnlockedNow(true), []);
   const reducedMotion = usePrefersReducedMotion();
   // The recipient always sees the gift in the language the sender chose, not
   // their own toggle. Default to "en" until the gift loads (keeps hook order stable).
@@ -109,6 +173,10 @@ export default function GiftView() {
     if (slug) void markOpened({ slug });
   };
 
+  // Presentational lock: sealed and un-unwrappable until the sender's chosen time.
+  const locked =
+    gift.openAfter != null && !unlockedNow && mountNow < gift.openAfter;
+
   return (
     <div dir={rtl ? "rtl" : "ltr"} lang={lang} className="flex min-h-dvh flex-col">
       <div className="relative min-h-[60vh] flex-1">
@@ -137,13 +205,22 @@ export default function GiftView() {
             <p className="text-stone-300 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)]">
               {t.gift.fromName(gift.senderName)}
             </p>
-            <button
-              type="button"
-              onClick={unwrap}
-              className="pointer-events-auto mt-6 min-h-[52px] rounded-full bg-rose-500 px-8 text-lg font-medium text-white transition hover:bg-rose-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
-            >
-              {t.gift.unwrap}
-            </button>
+            {locked && gift.openAfter != null ? (
+              <LockedSeal
+                openAfter={gift.openAfter}
+                lang={lang}
+                opensOnLabel={t.gift.opensOn}
+                onUnlock={unlock}
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={unwrap}
+                className="pointer-events-auto mt-6 min-h-[52px] rounded-full bg-rose-500 px-8 text-lg font-medium text-white transition hover:bg-rose-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+              >
+                {t.gift.unwrap}
+              </button>
+            )}
           </div>
         )}
       </div>

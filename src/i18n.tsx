@@ -32,6 +32,7 @@ const en = {
     messagePlaceholder: "Write something they'll remember…",
     creating: "Creating…",
     submit: "Create gift",
+    scheduleLabel: "Schedule when it opens",
     error: "Something went wrong. Please try again.",
     unknownHeading: "We don't have that gift",
     unknownCopy: "Pick one from the gallery to start personalizing it.",
@@ -54,6 +55,7 @@ const en = {
     unwrap: "Tap to unwrap",
     replay: "Replay",
     sendBack: "Send one back →",
+    opensOn: (date: string) => `Opens ${date}`,
   },
   notFound: {
     heading: "This link doesn't lead to a gift",
@@ -85,6 +87,7 @@ const ar: Strings = {
     messagePlaceholder: "اكتب شيئًا لا يُنسى…",
     creating: "جارٍ الإنشاء…",
     submit: "أنشئ الهدية",
+    scheduleLabel: "حدّد موعد فتحها",
     error: "حدث خطأ ما. حاول مرة أخرى.",
     unknownHeading: "لا نملك هذه الهدية",
     unknownCopy: "اختر واحدة من المعرض لتبدأ بتخصيصها.",
@@ -107,6 +110,7 @@ const ar: Strings = {
     unwrap: "اضغط لفتحها",
     replay: "إعادة",
     sendBack: "أرسل واحدة بالمقابل ←",
+    opensOn: (date: string) => `تُفتح ${date}`,
   },
   notFound: {
     heading: "هذا الرابط لا يؤدي إلى هدية",

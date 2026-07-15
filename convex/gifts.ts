@@ -20,6 +20,7 @@ export const createGift = mutation({
     message: v.string(),
     variants: v.record(v.string(), v.string()),
     lang: v.union(v.literal("en"), v.literal("ar")),
+    openAfter: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const def = catalog[args.giftType];
@@ -55,6 +56,12 @@ export const createGift = mutation({
     }
     const statusKey = randomId(16);
 
+    // Only honor a genuinely-future unlock; a past/now value just means "open now".
+    const openAfter =
+      args.openAfter !== undefined && args.openAfter > Date.now()
+        ? args.openAfter
+        : undefined;
+
     await ctx.db.insert("gifts", {
       giftType: args.giftType,
       senderName,
@@ -64,6 +71,7 @@ export const createGift = mutation({
       lang: args.lang,
       slug,
       statusKey,
+      ...(openAfter !== undefined ? { openAfter } : {}),
     });
 
     return { slug, statusKey };
@@ -86,6 +94,7 @@ export const getGift = query({
       message: gift.message,
       variants: gift.variants,
       lang: gift.lang ?? "en",
+      openAfter: gift.openAfter ?? null,
     };
   },
 });
@@ -116,6 +125,7 @@ export const getStatus = query({
     return {
       slug: gift.slug,
       openedAt: gift.openedAt ?? null,
+      openAfter: gift.openAfter ?? null,
     };
   },
 });

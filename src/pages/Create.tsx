@@ -12,6 +12,10 @@ import NotFound from "./NotFound";
 const inputClass =
   "w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-stone-100 placeholder:text-stone-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400";
 
+// Format a Date as a `datetime-local` value ("YYYY-MM-DDTHH:mm") in local time.
+const toLocalInput = (d: Date) =>
+  new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+
 export default function Create() {
   const { giftType } = useParams();
   const def = giftType ? registry[giftType] : undefined;
@@ -28,6 +32,9 @@ export default function Create() {
   const [senderName, setSenderName] = useState("");
   const [recipientName, setRecipientName] = useState("");
   const [message, setMessage] = useState("");
+  const [scheduled, setScheduled] = useState(false);
+  const [openAfterLocal, setOpenAfterLocal] = useState("");
+  const [minLocal] = useState(() => toLocalInput(new Date(Date.now() + 60_000)));
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,12 +43,17 @@ export default function Create() {
   }
 
   const canSubmit =
-    !submitting && senderName.trim().length > 0 && recipientName.trim().length > 0;
+    !submitting &&
+    senderName.trim().length > 0 &&
+    recipientName.trim().length > 0 &&
+    (!scheduled || openAfterLocal !== "");
 
   const handleCreate = async () => {
     setSubmitting(true);
     setError(null);
     try {
+      const openAfterMs =
+        scheduled && openAfterLocal ? new Date(openAfterLocal).getTime() : NaN;
       const { statusKey } = await createGift({
         giftType: def.id,
         senderName: senderName.trim(),
@@ -49,6 +61,7 @@ export default function Create() {
         message: message.trim(),
         variants,
         lang,
+        openAfter: Number.isNaN(openAfterMs) ? undefined : openAfterMs,
       });
       navigate(`/sent/${statusKey}`);
     } catch {
@@ -196,6 +209,39 @@ export default function Create() {
           className={`${inputClass} resize-none`}
         />
       </label>
+
+      <div className="flex flex-col gap-3">
+        <label className="flex items-center gap-3 text-sm font-medium text-stone-300">
+          <input
+            type="checkbox"
+            checked={scheduled}
+            onChange={(e) => setScheduled(e.target.checked)}
+            className="size-4 accent-rose-500"
+          />
+          {t.create.scheduleLabel}
+        </label>
+        {scheduled ? (
+          <>
+            <input
+              type="datetime-local"
+              value={openAfterLocal}
+              min={minLocal}
+              onChange={(e) => setOpenAfterLocal(e.target.value)}
+              className={`${inputClass} [color-scheme:dark]`}
+            />
+            {openAfterLocal ? (
+              <p className="text-xs text-stone-500">
+                {t.gift.opensOn(
+                  new Date(openAfterLocal).toLocaleString(lang, {
+                    dateStyle: "full",
+                    timeStyle: "short",
+                  }),
+                )}
+              </p>
+            ) : null}
+          </>
+        ) : null}
+      </div>
 
       {error && <p className="text-sm text-rose-400">{error}</p>}
 

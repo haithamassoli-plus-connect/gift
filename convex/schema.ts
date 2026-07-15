@@ -14,6 +14,11 @@ export default defineSchema({
     slug: v.string(),
     statusKey: v.string(),
     openedAt: v.optional(v.number()),
+    // Epoch ms before which the gift stays sealed. Absent = openable immediately.
+    // ponytail: presentational gate — getGift still returns the message; the
+    // recipient can't see it in the UI early but could in the network response.
+    // Upgrade path if that matters: withhold message/variants server-side until now >= openAfter.
+    openAfter: v.optional(v.number()),
   })
     .index("by_slug", ["slug"])
     .index("by_statusKey", ["statusKey"]),
