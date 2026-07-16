@@ -451,7 +451,6 @@ export default function HourglassScene({
   // before a finger was down.
   const g = useRef({
     active: false,
-    touched: false,
     committed: false,
     flipAt: -1,
     drag: 0,
@@ -461,7 +460,7 @@ export default function HourglassScene({
   });
   useLayoutEffect(() => {
     const r = g.current;
-    r.active = r.touched = r.committed = false;
+    r.active = r.committed = false;
     r.flipAt = -1;
     r.drag = r.px = r.idle = r.alone = 0;
   }, [phase]);
@@ -472,7 +471,6 @@ export default function HourglassScene({
     if (phase !== "opening" || g.current.committed) return;
     const r = g.current;
     r.active = true;
-    r.touched = true;
     r.px = ev.point.x;
     r.idle = 0;
     try {

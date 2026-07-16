@@ -7,7 +7,6 @@ import { useOpeningClock } from "../useOpeningClock";
 import { clamp01, easeOutCubic, lerp, mulberry32, smooth } from "../math";
 import { makeRadialSprite } from "../sprites";
 import { clack, resumeAudio, tone } from "../audio";
-import { pick } from "../catalog";
 import { forRecipient } from "../../i18n";
 
 /* ============================================================================
@@ -149,7 +148,7 @@ function buildDoc(
   const rtl = lang === "ar";
   const salutation = forRecipient(lang, recipient); // "For Layla" / "إلى ليلى" — the recipient, in red
   const signName = sender.trim();
-  const signoff = signName ? pick(lang, `— ${signName}`, `— ${signName}`) : "";
+  const signoff = signName ? `— ${signName}` : "";
 
   const lines: DocLine[] = [];
   if (isPreview) {
@@ -331,7 +330,6 @@ export default function TypewriterScene({
     bell: 0, // margin-bell glow 0..1
     shiver: 0, // ribbon vibration 0..1
     cursorX: 0, // eased carriage cursor world X
-    lastCommitAt: -99,
     lastManualT: -99,
     mercyAcc: 0,
     finishT: -1,
@@ -345,7 +343,6 @@ export default function TypewriterScene({
     const a = animRef.current;
     a.press = a.strike = a.bell = a.shiver = a.mercyAcc = 0;
     a.pressIdx = -1;
-    a.lastCommitAt = -99;
     a.lastManualT = -99;
     a.finishT = -1;
     if (phase === "sealed" || phase === "opening") typedRef.current = 0;
@@ -418,7 +415,6 @@ export default function TypewriterScene({
       a.pressIdx = Math.floor(keyRng() * keys.length);
     }
     a.press = 1;
-    a.lastCommitAt = tRef.current;
     if (manual) a.lastManualT = tRef.current;
   };
 

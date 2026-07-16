@@ -1,8 +1,6 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Georgia", "Times New Roman", serif;
-
   /* Loading. The float and the halo share a 6s period so the mark and its light
      breathe as one; the motes run on their own clock and stagger into a stream. */
   --animate-mark-float: mark-float 6s ease-in-out infinite;

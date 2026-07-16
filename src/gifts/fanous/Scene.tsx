@@ -3,7 +3,7 @@ import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import type { SceneProps } from "../types";
-import { makeRadialSprite } from "../sprites";
+import { makeRadialSprite, radialBlob } from "../sprites";
 import { makeTextTexture } from "../text3d";
 import { useOpeningClock } from "../useOpeningClock";
 import {
@@ -114,15 +114,8 @@ function buildEnvTexture(): THREE.Texture {
   sky.addColorStop(1, "#070506"); // the stone floor
   g.fillStyle = sky;
   g.fillRect(0, 0, W, H);
-  const blob = (x: number, y: number, r: number, inner: string) => {
-    const gr = g.createRadialGradient(x, y, 0, x, y, r);
-    gr.addColorStop(0, inner);
-    gr.addColorStop(1, "rgba(0,0,0,0)");
-    g.fillStyle = gr;
-    g.fillRect(x - r, y - r, r * 2, r * 2);
-  };
-  blob(64, 34, 40, "#ffdca0"); // a lantern burning across the alley
-  blob(190, 46, 30, "#3a4b66"); // cold night at the arch's mouth
+  radialBlob(g, 64, 34, 40, "#ffdca0"); // a lantern burning across the alley
+  radialBlob(g, 190, 46, 30, "#3a4b66"); // cold night at the arch's mouth
   const t = new THREE.CanvasTexture(c);
   t.mapping = THREE.EquirectangularReflectionMapping;
   t.colorSpace = THREE.SRGBColorSpace;
@@ -430,8 +423,6 @@ export default function FanousScene({
       metalness: 0.9,
       envMap: envTex,
       envMapIntensity: 1.0,
-      emissive: new THREE.Color(pal.halo),
-      emissiveIntensity: 0,
     });
     const cage = new THREE.MeshStandardMaterial({
       color: BRASS,
@@ -741,8 +732,8 @@ export default function FanousScene({
 
     /* ---- brass, cage, glass: emissive rides the flame ---- */
     const glow = clamp01(flame + flash);
-    setEmissive(brassMatRef.current, pal.halo, glow * 0.85);
-    setEmissive(cageMatRef.current, pal.halo, glow * 1.1);
+    if (brassMatRef.current) brassMatRef.current.emissiveIntensity = glow * 0.85;
+    if (cageMatRef.current) cageMatRef.current.emissiveIntensity = glow * 1.1;
     if (glassMatRef.current) {
       glassMatRef.current.emissiveIntensity = glow * 1.5;
       // the glass clears a touch as the flame lights it from behind
@@ -1090,18 +1081,4 @@ export default function FanousScene({
       </group>
     </>
   );
-}
-
-/* ---------- helpers ---------- */
-// Point a standard material's emissive at the hot colour and set its gain.
-// Kept out of the frame body so the two call sites read cleanly.
-const _tmpC = new THREE.Color();
-function setEmissive(
-  mat: THREE.MeshStandardMaterial | null,
-  hot: string,
-  intensity: number,
-) {
-  if (!mat) return;
-  mat.emissive.copy(_tmpC.set(hot));
-  mat.emissiveIntensity = intensity;
 }

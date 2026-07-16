@@ -375,6 +375,17 @@ export default function OudScene({
     releaseUpTo(Math.min(msg.P, releasedRef.current + CHUNK), tRef.current);
   };
 
+  const nearestString = (uvx: number) => {
+    const localX = (uvx - 0.5) * (STR_HALF_W * 2.8);
+    let idx = 0;
+    let best = Infinity;
+    for (let i = 0; i < N_STRINGS; i++) {
+      const d = Math.abs(localX - strings.xs[i]);
+      if (d < best) { best = d; idx = i; }
+    }
+    return idx;
+  };
+
   useFrame((state, delta) => {
     const dt = Math.min(delta, 0.05);
     const el = state.clock.elapsedTime;
@@ -675,16 +686,7 @@ export default function OudScene({
             onPointerDown={(ev) => {
               ev.stopPropagation();
               if (phase !== "opening") return; // sealed→opening is the host's tap, not ours
-              const localX = (ev.uv!.x - 0.5) * (STR_HALF_W * 2.8);
-              let idx = 0;
-              let best = Infinity;
-              for (let i = 0; i < N_STRINGS; i++) {
-                const d = Math.abs(localX - strings.xs[i]);
-                if (d < best) {
-                  best = d;
-                  idx = i;
-                }
-              }
+              const idx = nearestString(ev.uv!.x);
               lastStrumRef.current = idx;
               pluckString(idx);
             }}
@@ -692,16 +694,7 @@ export default function OudScene({
               if (phase !== "opening" || (ev.buttons ?? 0) === 0) return;
               ev.stopPropagation();
               // a drag across the strings strums: pluck each newly-crossed string once
-              const localX = (ev.uv!.x - 0.5) * (STR_HALF_W * 2.8);
-              let idx = 0;
-              let best = Infinity;
-              for (let i = 0; i < N_STRINGS; i++) {
-                const d = Math.abs(localX - strings.xs[i]);
-                if (d < best) {
-                  best = d;
-                  idx = i;
-                }
-              }
+              const idx = nearestString(ev.uv!.x);
               if (idx !== lastStrumRef.current) {
                 lastStrumRef.current = idx;
                 pluckString(idx);

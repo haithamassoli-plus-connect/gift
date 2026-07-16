@@ -486,7 +486,6 @@ export default function QalamScene({
     const top = halfH;
     const bottom = roundelCY - ROUNDEL_R;
     return {
-      halfH,
       roundelCY,
       artW: 1 + 2 * FPAD,
       artH: top - bottom,
@@ -645,7 +644,7 @@ export default function QalamScene({
 
     /* ---------- the wet sheen chasing the nib ---------- */
     if (headGlowRef.current) {
-      const on = ink && (writing || (phase === "revealed" ? false : opening && s.progress > 0 && s.progress < 0.999));
+      const on = ink && (writing || (opening && s.progress > 0 && s.progress < 0.999));
       let a = 0;
       if (ink && on) {
         const hi = Math.min(ink.spineCount - 1, Math.floor(s.progress * (ink.spineCount - 1)));

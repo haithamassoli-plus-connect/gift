@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import type { SceneProps } from "../types";
+import { forRecipient } from "../../i18n";
 import { useOpeningClock } from "../useOpeningClock";
 import { sampleTextPoints } from "../text3d";
 import { clamp01, easeInOut, easeOutCubic, lerp, mulberry32, smooth } from "../math";
@@ -196,7 +197,7 @@ export default function ButterflyJarScene({
 
   // Text formation targets (particle text via sampleTextPoints).
   const textSource =
-    message.trim() || recipientName.trim() || (lang === "ar" ? "إليك" : "For you");
+    message.trim() || recipientName.trim() || forRecipient(lang, "");
   const targets = useMemo(() => {
     const tp = sampleTextPoints(textSource, { maxPoints: 300, fontSize: 90, seed: 5, lang });
     const count = Math.max(1, tp.count);

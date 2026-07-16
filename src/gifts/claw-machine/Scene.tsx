@@ -3,7 +3,7 @@ import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import type { SceneProps } from "../types";
-import { makeRadialSprite } from "../sprites";
+import { makeRadialSprite, radialBlob } from "../sprites";
 import { makeTextTexture } from "../text3d";
 import { useOpeningClock } from "../useOpeningClock";
 import { clamp01, easeInOut, easeOutBack, easeOutCubic, lerp, mulberry32, smooth } from "../math";
@@ -168,8 +168,6 @@ const shadowTex = makeRadialSprite(64, [
   [0.8, "rgba(255,255,255,0.3)"],
   [1, "rgba(255,255,255,0)"],
 ]);
-// the floor puddle wants the opposite: all falloff, no core
-const puddleTex = makeRadialSprite();
 
 /* ---------- the arcade, as something for the chrome to reflect ---------- */
 // Bare metal with no envMap renders black — the claw is the one chrome thing in
@@ -190,16 +188,9 @@ function buildEnvTexture(): THREE.Texture {
   g.fillRect(0, 0, W, H);
   g.fillStyle = "#e8f0ff"; // ceiling strip lights, the hard highlight on the talons
   for (let i = 0; i < 4; i++) g.fillRect(18 + i * 64, 8, 34, 5);
-  const blob = (x: number, y: number, r: number, inner: string) => {
-    const gr = g.createRadialGradient(x, y, 0, x, y, r);
-    gr.addColorStop(0, inner);
-    gr.addColorStop(1, "rgba(0,0,0,0)");
-    g.fillStyle = gr;
-    g.fillRect(x - r, y - r, r * 2, r * 2);
-  };
-  blob(46, 62, 40, "#ff2e88");
-  blob(150, 58, 34, "#22d3ee");
-  blob(228, 70, 30, "#a855f7");
+  radialBlob(g, 46, 62, 40, "#ff2e88");
+  radialBlob(g, 150, 58, 34, "#22d3ee");
+  radialBlob(g, 228, 70, 30, "#a855f7");
   const t = new THREE.CanvasTexture(c);
   t.mapping = THREE.EquirectangularReflectionMapping;
   t.colorSpace = THREE.SRGBColorSpace;
@@ -479,8 +470,6 @@ function makeFuzzMaterial(color: string, rim: THREE.Color, k: number, fade = fal
   });
   const uRim = { value: rim };
   const uK = { value: k };
-  m.userData.uRim = uRim;
-  m.userData.uK = uK;
   m.onBeforeCompile = (s) => {
     s.uniforms.uRim = uRim;
     s.uniforms.uK = uK;
@@ -599,7 +588,6 @@ export default function ClawMachineScene({
         roughness: 0.25, toneMapped: false,
       });
     const m = {
-      rim,
       paint: new THREE.MeshStandardMaterial({
         color: cab.paint, roughness: 0.5, metalness: 0.14, envMap: envTex, envMapIntensity: 0.4,
       }),
@@ -1126,7 +1114,7 @@ export default function ClawMachineScene({
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, BASE_Y0 + 0.005, 0.55]}>
           <planeGeometry args={[3.8, 3.2]} />
           <meshBasicMaterial
-            ref={puddleMatRef} map={puddleTex} color={cab.neon} transparent opacity={0.26}
+            ref={puddleMatRef} map={glowTex} color={cab.neon} transparent opacity={0.26}
             depthWrite={false} blending={THREE.AdditiveBlending}
           />
         </mesh>

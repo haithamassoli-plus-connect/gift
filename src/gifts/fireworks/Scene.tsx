@@ -408,6 +408,11 @@ export default function FireworksScene({
     return { events, end: finaleT + 1.6 };
   }, [message, recipientName, lang]);
 
+  const firstChunk = useMemo(
+    () => chunkMessage(message, recipientName, lang)[0],
+    [message, recipientName, lang],
+  );
+
   useEffect(() => {
     if (phase === "opening" && simRef.current) {
       simRef.current.pool.mode.fill(DEAD);
@@ -460,7 +465,7 @@ export default function FireworksScene({
     if ((phase === "preview" || phase === "revealed") && sim.worldT > sim.ambientNext) {
       sim.ambientNext = sim.worldT + 2.2 + Math.random() * 1.4;
       if (phase === "preview" && Math.random() < 0.3) {
-        const chunk = chunkMessage(message, recipientName, lang)[0];
+        const chunk = firstChunk;
         launchRocket(sim, palette, (Math.random() - 0.5) * 1.2, { kind: "text", word: chunk, lang });
       } else {
         launchRocket(sim, palette, (Math.random() - 0.5) * 2.4, { kind: "sphere" });

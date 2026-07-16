@@ -4,7 +4,7 @@ import { PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import type { SceneProps } from "../types";
 import { makeRadialSprite } from "../sprites";
-import { makePaintMask, type PaintMask } from "../mask";
+import { makePaintMask, paintWritePath, type PaintMask } from "../mask";
 import { orderWritePath, type WritePath } from "../text3d";
 import { useOpeningClock } from "../useOpeningClock";
 import { clamp01, easeOutCubic, lerp, mulberry32, smooth } from "../math";
@@ -370,40 +370,6 @@ function fogFull(mask: PaintMask, u: number, v: number) {
   for (let i = 0; i < FOG_FILL_DABS; i++) mask.paint(u, v, SPREAD_R, "draw");
 }
 
-/* ---------- the unseen fingertip ---------- */
-/** Erasing the fog along the ordered path *is* the finger — there is nothing else to draw. */
-function writeTo(
-  mask: PaintMask,
-  w: WritePath,
-  lineStart: Set<number>,
-  from: number,
-  to: number,
-  r: number,
-  wFrac: number,
-  gap2: number,
-  vOff: number,
-) {
-  for (let i = Math.max(0, from + 1); i <= to; i++) {
-    const u = 0.5 + w.path[i * 2] * wFrac;
-    const v = 0.5 + w.path[i * 2 + 1] * wFrac + vOff;
-    // the hand lifts between lines instead of dragging back across the whole block
-    if (i === 0 || lineStart.has(i)) {
-      mask.paint(u, v, r, "erase");
-      continue;
-    }
-    const pu = 0.5 + w.path[(i - 1) * 2] * wFrac;
-    const pv = 0.5 + w.path[(i - 1) * 2 + 1] * wFrac + vOff;
-    // lineStarts is not the only place the path leaps. It is a sweep *through* the ink,
-    // column by column, so it also jumps the gap between two letters and — worse — across
-    // a counter, whenever one column holds ink both above and below the hole in an "o".
-    // Dragging the pen through those fills every letter in solid. Lift it on any leap.
-    const du = u - pu;
-    const dv = v - pv;
-    if (du * du + dv * dv > gap2) mask.paint(u, v, r, "erase");
-    else mask.stroke(pu, pv, u, v, r, "erase");
-  }
-}
-
 /* ---------- condensation drips ---------- */
 interface Drip {
   x: number;
@@ -678,7 +644,7 @@ export default function FoggyMirrorScene({
       // gallery card never runs anything at all. Preview draws it too: writing in fog is
       // the gift, and without it the card was a featureless grey tile.
       if (cold && write) {
-        writeTo(mask, write.w, write.lineStart, -1, write.w.count - 1, dab, wFrac, gap2, vOff);
+        paintWritePath(mask, write.w, write.lineStart, -1, write.w.count - 1, dab, wFrac, gap2, vOff, "erase");
         writeAtRef.current = write.w.count - 1;
         for (let i = 0; i < write.drips.length; i++) {
           dripTrail(mask, write.drips[i], 0, DRIP_STEPS, wFrac, span);
@@ -739,7 +705,7 @@ export default function FoggyMirrorScene({
     if (write && opening && t >= tWrite) {
       const target = Math.floor(clamp01((t - tWrite) / write.dur) * (write.w.count - 1));
       if (target > writeAtRef.current) {
-        writeTo(mask, write.w, write.lineStart, writeAtRef.current, target, dab, wFrac, gap2, vOff);
+        paintWritePath(mask, write.w, write.lineStart, writeAtRef.current, target, dab, wFrac, gap2, vOff, "erase");
         writeAtRef.current = target;
       }
     }

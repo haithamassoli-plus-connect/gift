@@ -3,7 +3,7 @@ import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import type { SceneProps } from "../types";
-import { makeRadialSprite } from "../sprites";
+import { makeRadialSprite, radialBlob } from "../sprites";
 import { makeTextTexture } from "../text3d";
 import { useOpeningClock } from "../useOpeningClock";
 import { clamp01, easeOutCubic, lerp, mulberry32, smooth } from "../math";
@@ -388,21 +388,14 @@ function buildEnvTexture(s: Sky): THREE.Texture {
   grad.addColorStop(1, s.horizon); // and the warm floor under it
   g.fillStyle = grad;
   g.fillRect(0, 0, W, H);
-  const blob = (x: number, y: number, r: number, inner: string) => {
-    const gr = g.createRadialGradient(x, y, 0, x, y, r);
-    gr.addColorStop(0, inner);
-    gr.addColorStop(1, "rgba(0,0,0,0)");
-    g.fillStyle = gr;
-    g.fillRect(x - r, y - r, r * 2, r * 2);
-  };
-  blob(64, 86, 92, s.glow); // where the sun has not quite arrived
-  blob(196, 40, 30, s.fill); // the cold quarter, which is what silver lives off
-  blob(150, 96, 60, s.glow);
+  radialBlob(g, 64, 86, 92, s.glow); // where the sun has not quite arrived
+  radialBlob(g, 196, 40, 30, s.fill); // the cold quarter, which is what silver lives off
+  radialBlob(g, 150, 96, 60, s.glow);
   const rand = mulberry32(4242);
   for (let i = 0; i < s.stars / 3; i++) {
     const x = rand() * W;
     const y = rand() * H * 0.7;
-    blob(x, y, 1.4 + rand() * 1.6, "rgba(255,255,255,0.9)");
+    radialBlob(g, x, y, 1.4 + rand() * 1.6, "rgba(255,255,255,0.9)");
   }
   const t = new THREE.CanvasTexture(c);
   t.mapping = THREE.EquirectangularReflectionMapping;

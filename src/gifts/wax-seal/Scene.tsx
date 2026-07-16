@@ -3,7 +3,7 @@ import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import type { SceneProps } from "../types";
-import { makeRadialSprite } from "../sprites";
+import { makeRadialSprite, radialBlob } from "../sprites";
 import { makeTextTexture } from "../text3d";
 import { useOpeningClock } from "../useOpeningClock";
 import { clamp01, easeInOut, easeOutBack, easeOutCubic, lerp, mulberry32, smooth } from "../math";
@@ -156,15 +156,8 @@ function buildEnvTexture(): THREE.Texture {
   sky.addColorStop(1, "#080506");
   g.fillStyle = sky;
   g.fillRect(0, 0, W, H);
-  const blob = (x: number, y: number, r: number, col: string) => {
-    const gr = g.createRadialGradient(x, y, 0, x, y, r);
-    gr.addColorStop(0, col);
-    gr.addColorStop(1, "rgba(0,0,0,0)");
-    g.fillStyle = gr;
-    g.fillRect(x - r, y - r, r * 2, r * 2);
-  };
-  blob(30, 30, 22, "#ffd39a"); // the candle's warm pool
-  blob(96, 24, 20, "#3a4c66"); // cold daylight from a window
+  radialBlob(g, 30, 30, 22, "#ffd39a"); // the candle's warm pool
+  radialBlob(g, 96, 24, 20, "#3a4c66"); // cold daylight from a window
   const t = new THREE.CanvasTexture(c);
   t.mapping = THREE.EquirectangularReflectionMapping;
   t.colorSpace = THREE.SRGBColorSpace;

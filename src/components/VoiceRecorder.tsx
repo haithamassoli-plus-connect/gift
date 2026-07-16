@@ -17,8 +17,6 @@ export function VoiceRecorder({ onChange }: { onChange: (blob: Blob | null) => v
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const mimeRef = useRef<string>("");
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const autoStopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const urlRef = useRef<string | null>(null);
@@ -81,18 +79,17 @@ export function VoiceRecorder({ onChange }: { onChange: (blob: Blob | null) => v
     const mimeType = MediaRecorder.isTypeSupported("audio/mp4")
       ? "audio/mp4"
       : "audio/webm;codecs=opus";
-    mimeRef.current = mimeType;
 
     const recorder = new MediaRecorder(stream, { mimeType });
     recorderRef.current = recorder;
-    chunksRef.current = [];
+    const chunks: Blob[] = [];
 
     recorder.addEventListener("dataavailable", (event) => {
-      if (event.data.size > 0) chunksRef.current.push(event.data);
+      if (event.data.size > 0) chunks.push(event.data);
     });
     recorder.addEventListener("stop", () => {
       stopTracks();
-      const blob = new Blob(chunksRef.current, { type: mimeRef.current });
+      const blob = new Blob(chunks, { type: mimeType });
       setUrl(URL.createObjectURL(blob));
       setState("recorded");
       onChange(blob);

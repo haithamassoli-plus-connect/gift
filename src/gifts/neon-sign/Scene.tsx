@@ -530,6 +530,8 @@ export default function NeonSignScene({
     [mats],
   );
 
+  const sparkCore = useMemo(() => new THREE.Color(gas.core), [gas]);
+
   const sky = useMemo(() => buildSkyTexture(night), [night]);
   useEffect(() => () => sky.dispose(), [sky]);
 
@@ -624,7 +626,6 @@ export default function NeonSignScene({
   const starRef = useRef<THREE.Points>(null);
   const rainRef = useRef<THREE.LineSegments>(null);
   const fogRef = useRef<THREE.Group>(null);
-  const lampRef = useRef<THREE.Sprite>(null);
   const lampMatRef = useRef<THREE.SpriteMaterial>(null);
   const sparkRef = useRef<THREE.Points>(null);
 
@@ -864,7 +865,6 @@ export default function NeonSignScene({
       const sk = sparks.current;
       const pa = sp.geometry.attributes.position as THREE.BufferAttribute;
       const ca = sp.geometry.attributes.color as THREE.BufferAttribute;
-      const cc = new THREE.Color(gas.core);
       for (let i = 0; i < SPARK_N; i++) {
         const a = e - sk.t0[i];
         if (a < 0 || a > SPARK_LIFE) {
@@ -874,7 +874,7 @@ export default function NeonSignScene({
         }
         pa.setXYZ(i, sk.ox[i] + sk.vx[i] * a, sk.oy[i] + sk.vy[i] * a - 0.55 * a * a, 0.06);
         const k = 1 - a / SPARK_LIFE;
-        ca.setXYZ(i, cc.r * k, cc.g * k, cc.b * k);
+        ca.setXYZ(i, sparkCore.r * k, sparkCore.g * k, sparkCore.b * k);
       }
       pa.needsUpdate = true;
       ca.needsUpdate = true;
@@ -971,7 +971,7 @@ export default function NeonSignScene({
           <meshBasicMaterial color="#0a0d14" transparent opacity={0.85} depthWrite={false} />
         </mesh>
         {/* the one work lamp, warm, off to the side */}
-        <sprite ref={lampRef} position={[-1.9, -0.7, 0.4]} scale={2.6}>
+        <sprite position={[-1.9, -0.7, 0.4]} scale={2.6}>
           <spriteMaterial
             ref={lampMatRef} map={glowTex} color={gas.lamp} transparent opacity={0}
             depthWrite={false} toneMapped={false} blending={THREE.AdditiveBlending}

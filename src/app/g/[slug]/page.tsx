@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
@@ -47,14 +47,10 @@ function LockedSeal({
     return () => clearInterval(id);
   }, []);
 
-  const dateLabel = useMemo(
-    () =>
-      new Date(openAfter).toLocaleString(lang, {
-        dateStyle: "full",
-        timeStyle: "short",
-      }),
-    [openAfter, lang],
-  );
+  const dateLabel = new Date(openAfter).toLocaleString(lang, {
+    dateStyle: "full",
+    timeStyle: "short",
+  });
 
   return (
     <div className="mt-6 flex flex-col items-center gap-1">

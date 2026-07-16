@@ -23,7 +23,7 @@ import { mulberry32 } from "./math";
  * gives an oud-ish ~1.5s sustain; the 0.5 averaging already removes the high end fast,
  * so even damping 1 decays.
  */
-export function karplusStrong(
+function karplusStrong(
   sampleRate: number,
   freq: number,
   seconds: number,
@@ -56,13 +56,20 @@ type Win = typeof window & { webkitAudioContext?: typeof AudioContext };
 let ctx: AudioContext | null = null;
 let noiseBuf: AudioBuffer | null = null;
 
-/** The one shared context, created on first ask. null if the browser has no WebAudio. */
-export function getAudioCtx(): AudioContext | null {
-  if (ctx) return ctx;
+/**
+ * A fresh AudioContext (with the webkit-prefixed fallback), or null if the browser
+ * has no WebAudio. Scenes that own a dedicated context and lifecycle — `mixtape`,
+ * `music-box` — use this; the shared one-shot SFX below reuse a single context via
+ * getAudioCtx.
+ */
+export function createAudioContext(): AudioContext | null {
   const Ctor = window.AudioContext ?? (window as Win).webkitAudioContext;
-  if (!Ctor) return null;
-  ctx = new Ctor();
-  return ctx;
+  return Ctor ? new Ctor() : null;
+}
+
+/** The one shared context, created on first ask. null if the browser has no WebAudio. */
+function getAudioCtx(): AudioContext | null {
+  return (ctx ??= createAudioContext());
 }
 
 /** Call inside a pointer handler — a context created before a gesture starts suspended. */

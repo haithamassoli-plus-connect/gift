@@ -3,7 +3,7 @@ import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import type { SceneProps } from "../types";
-import { makeRadialSprite } from "../sprites";
+import { makeRadialSprite, radialBlob } from "../sprites";
 import { makeTextTexture, sampleTextPoints } from "../text3d";
 import { useOpeningClock } from "../useOpeningClock";
 import { clamp01, lerp, mulberry32, smooth } from "../math";
@@ -123,16 +123,9 @@ function buildEnvTexture(): THREE.Texture {
   sky.addColorStop(1, "#050407"); // packed dirt
   g.fillStyle = sky;
   g.fillRect(0, 0, W, H);
-  const blob = (x: number, y: number, r: number, inner: string) => {
-    const gr = g.createRadialGradient(x, y, 0, x, y, r);
-    gr.addColorStop(0, inner);
-    gr.addColorStop(1, "rgba(0,0,0,0)");
-    g.fillStyle = gr;
-    g.fillRect(x - r, y - r, r * 2, r * 2);
-  };
-  blob(60, 22, 54, "#fff2d2"); // the gap the shaft falls through
-  blob(196, 62, 42, "#41546e"); // cold daylight at the stall's mouth
-  for (let i = 0; i < 5; i++) blob(30 + i * 52, 46 + (i % 2) * 10, 9, "#ffbe63"); // lanterns
+  radialBlob(g, 60, 22, 54, "#fff2d2"); // the gap the shaft falls through
+  radialBlob(g, 196, 62, 42, "#41546e"); // cold daylight at the stall's mouth
+  for (let i = 0; i < 5; i++) radialBlob(g, 30 + i * 52, 46 + (i % 2) * 10, 9, "#ffbe63"); // lanterns
   const t = new THREE.CanvasTexture(c);
   t.mapping = THREE.EquirectangularReflectionMapping;
   t.colorSpace = THREE.SRGBColorSpace;
@@ -633,7 +626,6 @@ export default function MagicLampScene({
   const heatLightRef = useRef<THREE.PointLight>(null);
   const smokeLightRef = useRef<THREE.PointLight>(null);
   const motesRef = useRef<THREE.Points>(null);
-  const moteMatRef = useRef<THREE.PointsMaterial>(null);
   const sparkRef = useRef<THREE.Points>(null);
 
   const ignRef = useRef(-1);
@@ -915,7 +907,6 @@ export default function MagicLampScene({
       pa.needsUpdate = true;
       ca.needsUpdate = true;
     }
-    if (moteMatRef.current) moteMatRef.current.opacity = 1;
 
     /* ---- sparks ---- */
     const sp = sparkRef.current;
@@ -975,7 +966,7 @@ export default function MagicLampScene({
                 <bufferAttribute attach="attributes-color" args={[MOTES.col, 3]} />
               </bufferGeometry>
               <pointsMaterial
-                ref={moteMatRef} map={glowTex} vertexColors size={0.035} sizeAttenuation
+                map={glowTex} vertexColors size={0.035} sizeAttenuation
                 transparent depthWrite={false} blending={THREE.AdditiveBlending}
               />
             </points>

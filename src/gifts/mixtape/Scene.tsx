@@ -3,7 +3,8 @@ import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import type { SceneProps } from "../types";
-import { makeRadialSprite } from "../sprites";
+import { makeRadialSprite, radialBlob } from "../sprites";
+import { createAudioContext } from "../audio";
 import { makeTextTexture, orderWritePath } from "../text3d";
 import { useOpeningClock } from "../useOpeningClock";
 import { clamp01, easeOutCubic, lerp, mulberry32, smooth } from "../math";
@@ -116,16 +117,9 @@ function buildEnvTexture(): THREE.Texture {
   sky.addColorStop(1, "#080a0e");
   g.fillStyle = sky;
   g.fillRect(0, 0, W, H);
-  const blob = (x: number, y: number, r: number, inner: string) => {
-    const gr = g.createRadialGradient(x, y, 0, x, y, r);
-    gr.addColorStop(0, inner);
-    gr.addColorStop(1, "rgba(0,0,0,0)");
-    g.fillStyle = gr;
-    g.fillRect(x - r, y - r, r * 2, r * 2);
-  };
-  blob(70, 26, 62, "#ffffff"); // the room's one lamp — the streak the tape rolls through
-  blob(186, 40, 44, "#7f9ac4");
-  for (let i = 0; i < 4; i++) blob(24 + i * 66, 74, 16, "#ffc079"); // amber VU glow bouncing back up
+  radialBlob(g, 70, 26, 62, "#ffffff"); // the room's one lamp — the streak the tape rolls through
+  radialBlob(g, 186, 40, 44, "#7f9ac4");
+  for (let i = 0; i < 4; i++) radialBlob(g, 24 + i * 66, 74, 16, "#ffc079"); // amber VU glow bouncing back up
   const t = new THREE.CanvasTexture(c);
   t.mapping = THREE.EquirectangularReflectionMapping;
   t.colorSpace = THREE.SRGBColorSpace;
@@ -506,12 +500,6 @@ interface Tape {
   nextNoteTime: number;
   noteIndex: number;
   play: boolean;
-}
-
-function createAudioContext(): AudioContext | null {
-  const w = window as typeof window & { webkitAudioContext?: typeof AudioContext };
-  const Ctor = window.AudioContext ?? w.webkitAudioContext;
-  return Ctor ? new Ctor() : null;
 }
 
 function buildTape(): Tape | null {

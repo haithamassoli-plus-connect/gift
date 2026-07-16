@@ -399,8 +399,6 @@ export default function FalconScene({
   const meterMatRef = useRef<THREE.MeshBasicMaterial>(null);
   const shimmerRef = useRef<THREE.Group>(null);
   const discRef = useRef<THREE.Sprite>(null);
-  const birdHitRef = useRef<THREE.Mesh>(null);
-  const gloveHitRef = useRef<THREE.Mesh>(null);
 
   // opening state — plain mutable refs, restart with the clock on a replay
   const st = useRef({
@@ -877,7 +875,6 @@ export default function FalconScene({
       {/* ---------- hit targets ---------- */}
       {wantBirdHit && (
         <mesh
-          ref={birdHitRef}
           position={[PERCH.x, PERCH.y + 0.05, PERCH.z + 0.1]}
           onPointerDown={onBirdDown}
           onPointerMove={onBirdMove}
@@ -890,7 +887,6 @@ export default function FalconScene({
       )}
       {wantGloveHit && (
         <mesh
-          ref={gloveHitRef}
           position={[GLOVE.x, GLOVE.y - 0.05, GLOVE.z + 0.15]}
           onPointerDown={onGloveDown}
           onPointerUp={releaseGlove}

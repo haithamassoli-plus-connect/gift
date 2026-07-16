@@ -237,8 +237,6 @@ interface TextGridOptions {
   fontWeight?: string;
   maxWidthPx?: number;
   lineHeight?: number;
-  /** Alpha cutoff for "a cell holds ink" (0..255, default 110). */
-  threshold?: number;
   /** "ar" overrides fontFamily to Thmanyah and sets rtl bidi. */
   lang?: Lang;
 }
@@ -271,7 +269,6 @@ export function rasterTextGrid(text: string, opts: TextGridOptions): TextGrid {
     fontFamily = "system-ui, -apple-system, 'Segoe UI', sans-serif",
     fontWeight = "700",
     lineHeight = 1.15,
-    threshold = 110,
     lang,
   } = opts;
   const family = lang === "ar" ? AR_FONT : fontFamily;
@@ -315,7 +312,7 @@ export function rasterTextGrid(text: string, opts: TextGridOptions): TextGrid {
       let on = 0;
       for (let y = y0; y < y1 && !on; y++) {
         for (let x = x0; x < x1; x++) {
-          if (data[(y * width + x) * 4 + 3] > threshold) {
+          if (data[(y * width + x) * 4 + 3] > 110) {
             on = 1;
             break;
           }

@@ -429,7 +429,6 @@ export default function DominoRunScene({
   const bellRef = useRef(false);
   const dirtyRef = useRef(true);
   const snapRef = useRef(true); // snap the camera on the next static-phase frame
-  const runTPrevRef = useRef(0);
 
   useLayoutEffect(() => {
     dirtyRef.current = true;
@@ -437,7 +436,6 @@ export default function DominoRunScene({
     runStartRef.current = -1;
     nextTileRef.current = 0;
     bellRef.current = false;
-    runTPrevRef.current = 0;
   }, [phase, field]);
 
   const pipBase = useMemo(() => new THREE.Color(tile.pip), [tile]);
@@ -520,7 +518,6 @@ export default function DominoRunScene({
     // audio must begin inside a gesture; this IS the gesture
     resumeAudio();
     runStartRef.current = tRef.current;
-    runTPrevRef.current = 0;
     clack({ freq: 1700, gain: 0.32 }); // the first tile, under the thumb
     lastClackRef.current = 0;
   };
@@ -540,7 +537,6 @@ export default function DominoRunScene({
     // Untouched, the first tile tips on its own — company, not a timer.
     if (opening && runStartRef.current < 0 && t >= T_MERCY) {
       runStartRef.current = t;
-      runTPrevRef.current = 0;
     }
     const runT = opening && runStartRef.current >= 0 ? t - runStartRef.current : 0;
 
@@ -576,7 +572,6 @@ export default function DominoRunScene({
         bellRef.current = true;
         tone(880, { seconds: 1.1, gain: 0.3, shimmer: true }); // the last tile taps a tiny bell
       }
-      runTPrevRef.current = runT;
     }
 
     /* ---------- the camera ---------- */

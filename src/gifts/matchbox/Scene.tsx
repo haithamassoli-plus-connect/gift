@@ -648,8 +648,8 @@ export default function MatchboxScene({
   lang,
   onOpenComplete,
 }: SceneProps) {
-  const world = WORLDS[variants.world] ?? WORLDS[WORLD_KEYS[0]];
   const worldKey = WORLDS[variants.world] ? variants.world : WORLD_KEYS[0];
+  const world = WORLDS[worldKey];
   const { t: tRef, done: doneRef } = useOpeningClock(phase);
   const glCanvas = useThree((s) => s.gl.domElement);
   const invalidate = useThree((s) => s.invalidate);

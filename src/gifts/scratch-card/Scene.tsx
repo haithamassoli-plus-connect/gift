@@ -3,7 +3,7 @@ import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import type { SceneProps } from "../types";
-import { makeRadialSprite } from "../sprites";
+import { makeRadialSprite, radialBlob } from "../sprites";
 import { makePaintMask } from "../mask";
 import { makeTextTexture, type TextTexture } from "../text3d";
 import { useOpeningClock } from "../useOpeningClock";
@@ -242,17 +242,10 @@ function buildEnvTexture(): THREE.Texture {
   band.addColorStop(1, "rgba(255,240,212,0)");
   g.fillStyle = band;
   g.fillRect(0, H * 0.04, W, H * 0.26);
-  const blob = (x: number, y: number, r: number, inner: string) => {
-    const gr = g.createRadialGradient(x, y, 0, x, y, r);
-    gr.addColorStop(0, inner);
-    gr.addColorStop(1, "rgba(0,0,0,0)");
-    g.fillStyle = gr;
-    g.fillRect(x - r, y - r, r * 2, r * 2);
-  };
   // two lamps off the sides, so rolling the card left or right also has something to find
-  blob(48, 30, 22, "#ffd9a2");
-  blob(198, 24, 17, "#bcd6ff");
-  blob(126, 96, 30, "#191216"); // and one dark patch, or the sheet never has a shadow
+  radialBlob(g, 48, 30, 22, "#ffd9a2");
+  radialBlob(g, 198, 24, 17, "#bcd6ff");
+  radialBlob(g, 126, 96, 30, "#191216"); // and one dark patch, or the sheet never has a shadow
   const t = new THREE.CanvasTexture(c);
   t.mapping = THREE.EquirectangularReflectionMapping;
   t.colorSpace = THREE.SRGBColorSpace;

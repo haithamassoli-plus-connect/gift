@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { lerp } from "./math";
 import { makeRadialSprite } from "./sprites";
+import type { WritePath } from "./text3d";
 
 // A pointer-painted alpha mask for gift scenes: a plain 2D canvas behind a
 // CanvasTexture, which scenes sample as an alphaMap / mix factor. `scratch-card`
@@ -24,7 +25,7 @@ const STROKE_SPACING = 0.35;
 const COVERAGE_STEP = 8;
 
 /** "erase" cuts the mask away (destination-out), "draw" lays it down. */
-export type PaintMode = "erase" | "draw";
+type PaintMode = "erase" | "draw";
 
 interface PaintMaskOptions {
   /** Square texture resolution in px (default 512). */
@@ -132,4 +133,40 @@ export function makePaintMask(opts: PaintMaskOptions = {}): PaintMask {
       texture.dispose();
     },
   };
+}
+
+/**
+ * Paint the ordered glyph path `w` (from orderWritePath) into `mask` for indices
+ * (from, to], laying a dab at each point and stroking between adjacent ones. The pen
+ * lifts at every line start and wherever the dense column sweep leaps — letter gaps,
+ * the hole in an "o" — so letters fill solid instead of being webbed together. `mode`
+ * is "draw" to lay ink down (koi-pond's wake) or "erase" to cut the message out of a
+ * filled mask (foggy-mirror). Extracted from per-scene copies (identical bodies).
+ */
+export function paintWritePath(
+  mask: PaintMask,
+  w: WritePath,
+  lineStart: Set<number>,
+  from: number,
+  to: number,
+  r: number,
+  wFrac: number,
+  gap2: number,
+  vOff: number,
+  mode: PaintMode,
+) {
+  for (let i = Math.max(0, from + 1); i <= to; i++) {
+    const u = 0.5 + w.path[i * 2] * wFrac;
+    const v = 0.5 + w.path[i * 2 + 1] * wFrac + vOff;
+    if (i === 0 || lineStart.has(i)) {
+      mask.paint(u, v, r, mode);
+      continue;
+    }
+    const pu = 0.5 + w.path[(i - 1) * 2] * wFrac;
+    const pv = 0.5 + w.path[(i - 1) * 2 + 1] * wFrac + vOff;
+    const du = u - pu;
+    const dv = v - pv;
+    if (du * du + dv * dv > gap2) mask.paint(u, v, r, mode);
+    else mask.stroke(pu, pv, u, v, r, mode);
+  }
 }

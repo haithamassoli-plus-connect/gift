@@ -66,14 +66,11 @@ function buildShape(shape: string): ShapeData {
   let raw: Pt[];
   if (shape === "star") {
     raw = starVertices();
-  } else if (shape === "infinity") {
-    raw = [];
-    const N = 16;
-    for (let i = 0; i < N; i++) raw.push(lemniscatePoint((i / N) * Math.PI * 2));
   } else {
+    const fn = shape === "infinity" ? lemniscatePoint : heartPoint;
     raw = [];
     const N = 16;
-    for (let i = 0; i < N; i++) raw.push(heartPoint((i / N) * Math.PI * 2));
+    for (let i = 0; i < N; i++) raw.push(fn((i / N) * Math.PI * 2));
   }
 
   // normalize width -> 2.4, center, then lift so the shape centers at y = 0.6

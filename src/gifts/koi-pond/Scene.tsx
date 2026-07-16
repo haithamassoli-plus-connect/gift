@@ -4,8 +4,8 @@ import { PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import type { SceneProps } from "../types";
 import { makeRadialSprite } from "../sprites";
-import { makePaintMask, type PaintMask } from "../mask";
-import { orderWritePath, type WritePath } from "../text3d";
+import { makePaintMask, paintWritePath } from "../mask";
+import { orderWritePath } from "../text3d";
 import { useOpeningClock } from "../useOpeningClock";
 import { clamp01, lerp, mulberry32, smooth } from "../math";
 import { forRecipient } from "../../i18n";
@@ -580,37 +580,6 @@ const GLINTS = (() => {
 })();
 
 /* ---------- the writing ---------- */
-/** Ink laid along the ordered path *is* the message; the koi riding it are the reason. */
-function inkTo(
-  mask: PaintMask,
-  w: WritePath,
-  lineStart: Set<number>,
-  from: number,
-  to: number,
-  r: number,
-  wFrac: number,
-  gap2: number,
-  vOff: number,
-) {
-  for (let i = Math.max(0, from + 1); i <= to; i++) {
-    const u = 0.5 + w.path[i * 2] * wFrac;
-    const v = 0.5 + w.path[i * 2 + 1] * wFrac + vOff;
-    if (i === 0 || lineStart.has(i)) {
-      mask.paint(u, v, r, "draw");
-      continue;
-    }
-    const pu = 0.5 + w.path[(i - 1) * 2] * wFrac;
-    const pv = 0.5 + w.path[(i - 1) * 2 + 1] * wFrac + vOff;
-    // lineStarts is not the only place the path leaps: it is a dense sweep *through*
-    // the ink, column by column, so it also jumps between letters and across the hole
-    // in an "o" whenever one column holds ink both above and below it. Drag the wake
-    // through those and every letter fills in solid. Lift on any leap.
-    const du = u - pu;
-    const dv = v - pv;
-    if (du * du + dv * dv > gap2) mask.paint(u, v, r, "draw");
-    else mask.stroke(pu, pv, u, v, r, "draw");
-  }
-}
 
 /** How far a boxcar reaches down the path to find the line a fish could actually swim. */
 const SMOOTH_N = 48;
@@ -982,7 +951,7 @@ export default function KoiPondScene({
         // The finished tableau, laid cold. Reduced motion never runs an opening and the
         // gallery card never runs anything at all — both land here, on frame one.
         if (cold) {
-          inkTo(ink, write.w, write.lineStart, -1, write.w.count - 1, dab, wFrac, gap2, 0);
+          paintWritePath(ink, write.w, write.lineStart, -1, write.w.count - 1, dab, wFrac, gap2, 0, "draw");
           for (let j = 0; j < KOI_N; j++) penRef.current[j] = write.slices[j][1] - 1;
         }
       }
@@ -1035,7 +1004,7 @@ export default function KoiPondScene({
         if (b <= a) continue;
         const target = a + Math.floor(prog * (b - a)) - 1;
         if (target > penRef.current[j]) {
-          inkTo(ink, write.w, write.lineStart, penRef.current[j], target, dab, wFrac, gap2, 0);
+          paintWritePath(ink, write.w, write.lineStart, penRef.current[j], target, dab, wFrac, gap2, 0, "draw");
           penRef.current[j] = target;
         }
       }

@@ -16,3 +16,22 @@ export function makeRadialSprite(size = 32, stops: [number, string][] = [
   g.fillRect(0, 0, size, size);
   return new THREE.CanvasTexture(canvas);
 }
+
+// Draw a soft radial "blob" straight into a caller's 2D context: solid `inner`
+// colour at the centre fading to transparent at radius `r`. Unlike makeRadialSprite
+// (which owns a canvas and returns a texture), this paints into an existing canvas
+// scenes are already compositing — env maps, foil, lamps. Extracted from per-scene
+// copies (identical bodies).
+export function radialBlob(
+  g: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  r: number,
+  inner: string,
+) {
+  const gr = g.createRadialGradient(x, y, 0, x, y, r);
+  gr.addColorStop(0, inner);
+  gr.addColorStop(1, "rgba(0,0,0,0)");
+  g.fillStyle = gr;
+  g.fillRect(x - r, y - r, r * 2, r * 2);
+}

@@ -434,7 +434,6 @@ export default function TatreezScene({
 
   const fitRef = useRef<THREE.Group>(null);
   const tiltRef = useRef<THREE.Group>(null);
-  const clothRef = useRef<THREE.Mesh>(null);
   const stitchRef = useRef<THREE.InstancedMesh>(null);
   const motifRef = useRef<THREE.InstancedMesh>(null);
   const needleRef = useRef<THREE.Group>(null);
@@ -443,7 +442,6 @@ export default function TatreezScene({
   const monoRef = useRef<THREE.Mesh>(null);
   const tagRef = useRef<THREE.Group>(null);
   const guideRef = useRef<THREE.Mesh>(null);
-  const hitRef = useRef<THREE.Mesh>(null);
 
   // Per-frame uniform writes go through a ref: the memo owns the material and its
   // disposal, but the lint only accepts mutation through a *Ref (same shape as koi-pond).
@@ -742,7 +740,7 @@ export default function TatreezScene({
       <group ref={fitRef}>
         <group ref={tiltRef}>
           {/* the cloth, held taut in the hoop */}
-          <mesh ref={clothRef} position={[0, 0, 0]}>
+          <mesh position={[0, 0, 0]}>
             <planeGeometry args={[CLOTH_R * 2, CLOTH_R * 2, 40, 40]} />
             <primitive object={clothMat.mat} attach="material" />
           </mesh>
@@ -881,7 +879,6 @@ export default function TatreezScene({
           {/* the hit target — a transparent disc over the cloth. Raycasting ignores
               visible={false}, so it is opacity-0, not hidden. */}
           <mesh
-            ref={hitRef}
             position={[0, 0, STITCH_Z + 0.2]}
             onPointerDown={onDown}
             onPointerMove={onMove}

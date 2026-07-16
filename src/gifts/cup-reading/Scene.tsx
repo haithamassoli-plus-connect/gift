@@ -3,7 +3,7 @@ import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import type { SceneProps } from "../types";
-import { makeRadialSprite } from "../sprites";
+import { makeRadialSprite, radialBlob } from "../sprites";
 import { makeTextTexture, sampleTextPoints } from "../text3d";
 import { useOpeningClock } from "../useOpeningClock";
 import { clamp01, easeInOut, easeOutCubic, lerp, mulberry32, smooth } from "../math";
@@ -269,15 +269,8 @@ function buildWallTex(): THREE.CanvasTexture {
   sky.addColorStop(1, "#150c0c");
   g.fillStyle = sky;
   g.fillRect(0, 0, W, H);
-  const blob = (x: number, y: number, r: number, inner: string) => {
-    const gr = g.createRadialGradient(x, y, 0, x, y, r);
-    gr.addColorStop(0, inner);
-    gr.addColorStop(1, "rgba(0,0,0,0)");
-    g.fillStyle = gr;
-    g.fillRect(x - r, y - r, r * 2, r * 2);
-  };
-  blob(74, 84, 60, "rgba(255,178,92,0.5)"); // the lamp itself, off to the left
-  blob(200, 92, 44, "rgba(180,96,48,0.28)"); // and its throw on the far cushions
+  radialBlob(g, 74, 84, 60, "rgba(255,178,92,0.5)"); // the lamp itself, off to the left
+  radialBlob(g, 200, 92, 44, "rgba(180,96,48,0.28)"); // and its throw on the far cushions
   // a suggestion of the hanging carpet, never in focus
   g.globalAlpha = 0.12;
   g.strokeStyle = "#b8703a";

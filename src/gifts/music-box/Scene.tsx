@@ -7,6 +7,7 @@ import { useOpeningClock } from "../useOpeningClock";
 import { makeTextTexture } from "../text3d";
 import { forRecipient } from "../../i18n";
 import { makeRadialSprite } from "../sprites";
+import { createAudioContext } from "../audio";
 import { clamp01, easeOutBack, easeOutCubic, lerp, mulberry32, smooth } from "../math";
 
 /* ---------- box + stage layout (a vertical column around the origin) ---------- */
@@ -135,12 +136,6 @@ interface AudioState {
   nextNoteTime: number;
   startTime: number;
   noteIndex: number;
-}
-
-function createAudioContext(): AudioContext | null {
-  const w = window as typeof window & { webkitAudioContext?: typeof AudioContext };
-  const Ctor = window.AudioContext ?? w.webkitAudioContext;
-  return Ctor ? new Ctor() : null;
 }
 
 function scheduleNote(ctx: AudioContext, master: GainNode, freq: number, time: number, accent: boolean) {
