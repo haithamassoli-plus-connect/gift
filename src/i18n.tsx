@@ -79,6 +79,10 @@ const en = {
     copy: "This link doesn't lead to a gift — it may have been mistyped, or the gift was never created.",
     browse: "Browse gifts",
   },
+  error: {
+    heading: "This gift couldn't load",
+    copy: "Something went wrong on our end. Browse the gallery to keep going.",
+  },
   install: {
     title: "Install Gift",
     body: "Add Gift to your home screen for instant access — no app store.",
@@ -159,6 +163,10 @@ const ar: Strings = {
     heading: "لا شيء لفتحه هنا",
     copy: "هذا الرابط لا يؤدي إلى هدية — قد يكون مكتوبًا بشكل خاطئ، أو أن الهدية لم تُنشأ.",
     browse: "تصفّح الهدايا",
+  },
+  error: {
+    heading: "تعذّر تحميل الهدية",
+    copy: "حدث خطأ ما لدينا. تصفّح المعرض للمتابعة.",
   },
   install: {
     title: "ثبّت هدية",

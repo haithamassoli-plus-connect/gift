@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import { ImageResponse } from "next/og";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "@convex/_generated/api";
@@ -8,16 +9,29 @@ export const alt = "A gift for you";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// Resolve fonts relative to this module, not process.cwd(): on Vercel the
-// serverless function's cwd isn't where the traced fonts/ dir lands, so a
-// cwd-relative read ENOENTs and 500s every request. import.meta.url is stable.
-const bold = await readFile(
-  new URL("../../../../fonts/thmanyahsans-Bold.otf", import.meta.url),
-);
-const regular = await readFile(
-  new URL("../../../../fonts/thmanyahsans-Regular.otf", import.meta.url),
-);
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+// Fonts are read lazily on the first image request and cached — NEVER at module
+// scope. Next imports this file to resolve the /g/[slug] page's og:image metadata,
+// so a top-level read that throws crashes the *page* render (React #441 "Server
+// Components render"), not just the image. Keeping the module import side-effect-free
+// decouples the page from the OG card entirely. fileURLToPath keeps the path
+// module-relative (Vercel traces fonts/ next to this file, not at cwd) while handing
+// node:fs a string — some runtimes reject a Web URL instance here.
+let fontsPromise: Promise<[Buffer, Buffer]> | null = null;
+function loadFonts() {
+  fontsPromise ??= Promise.all([
+    readFile(
+      fileURLToPath(
+        new URL("../../../../fonts/thmanyahsans-Bold.otf", import.meta.url),
+      ),
+    ),
+    readFile(
+      fileURLToPath(
+        new URL("../../../../fonts/thmanyahsans-Regular.otf", import.meta.url),
+      ),
+    ),
+  ]);
+  return fontsPromise;
+}
 
 export default async function Image({
   params,
@@ -25,6 +39,7 @@ export default async function Image({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
   let gift = null;
   try {
     gift = await convex.query(api.gifts.getGift, { slug });
@@ -62,6 +77,8 @@ export default async function Image({
           { t: "a gift" },
         ]
     : [{ t: "Someone made you a gift" }];
+
+  const [bold, regular] = await loadFonts();
 
   return new ImageResponse(
     (
