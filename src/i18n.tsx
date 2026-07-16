@@ -79,6 +79,15 @@ const en = {
     copy: "It may have been mistyped, or the gift never existed.",
     browse: "Browse gifts",
   },
+  install: {
+    title: "Install Gift",
+    body: "Add Gift to your home screen for instant access — no app store.",
+    action: "Install",
+    dismiss: "Not now",
+    iosTitle: "Install Gift",
+    iosBody: 'Tap Share, then "Add to Home Screen".',
+    iosDone: "Got it",
+  },
 };
 
 type Strings = typeof en;
@@ -150,6 +159,15 @@ const ar: Strings = {
     heading: "هذا الرابط لا يؤدي إلى هدية",
     copy: "قد يكون مكتوبًا بشكل خاطئ، أو أن الهدية لم تكن موجودة.",
     browse: "تصفّح الهدايا",
+  },
+  install: {
+    title: "ثبّت هدية",
+    body: "أضف هدية إلى شاشتك الرئيسية للوصول الفوري — دون متجر تطبيقات.",
+    action: "تثبيت",
+    dismiss: "ليس الآن",
+    iosTitle: "ثبّت هدية",
+    iosBody: "اضغط زر المشاركة، ثم «أضف إلى الشاشة الرئيسية».",
+    iosDone: "حسنًا",
   },
 };
 

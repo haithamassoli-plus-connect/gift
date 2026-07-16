@@ -40,6 +40,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
+        {/* Capture beforeinstallprompt before hydration — this client-only app
+            renders too late for a React effect to catch it on warm loads.
+            Runs synchronously during HTML parse. See InstallPrompt.tsx. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__bip=e;dispatchEvent(new Event('bip-ready'))});addEventListener('appinstalled',function(){window.__bip=null})",
+          }}
+        />
         {/* globals.css sizes the app through the #root chain, same as the old SPA mount node. */}
         <div id="root">
           <Providers>{children}</Providers>

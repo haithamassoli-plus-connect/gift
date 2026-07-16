@@ -4,6 +4,7 @@ import { Suspense, useSyncExternalStore, type ReactNode } from "react";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { LangProvider } from "@/i18n";
 import { SiteCredit } from "@/components/SiteCredit";
+import { InstallPrompt } from "@/components/InstallPrompt";
 import Loading from "@/components/Loading";
 
 const client = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
@@ -30,6 +31,7 @@ export function Providers({ children }: { children: ReactNode }) {
         <footer className="py-8 text-center">
           <SiteCredit />
         </footer>
+        <InstallPrompt />
       </LangProvider>
     </ConvexProvider>
   );
