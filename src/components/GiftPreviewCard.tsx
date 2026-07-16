@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router";
+import Link from "next/link";
 import { GiftCanvas } from "./GiftCanvas";
 import type { GiftDef } from "../gifts/types";
 import { pick, defaultVariants } from "../gifts/catalog";
@@ -33,7 +33,7 @@ export function GiftPreviewCard({ def, lang }: { def: GiftDef; lang: Lang }) {
 
   return (
     <Link
-      to={`/create/${def.id}`}
+      href={`/create/${def.id}`}
       className="group block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#100b14]"
     >
       <div

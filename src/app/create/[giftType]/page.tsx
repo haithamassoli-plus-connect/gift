@@ -1,15 +1,17 @@
+"use client";
 import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import type { Id } from "../../convex/_generated/dataModel";
-import { GiftCanvas } from "../components/GiftCanvas";
-import { VoiceRecorder } from "../components/VoiceRecorder";
-import { registry } from "../gifts/registry";
-import { MESSAGE_MAX, NAME_MAX, PAYLOAD_MAX, pick, defaultVariants } from "../gifts/catalog";
-import { useArabicFontReady } from "../gifts/useArabicFontReady";
-import { useLang, LangToggle } from "../i18n";
-import NotFound from "./NotFound";
+import { api } from "@convex/_generated/api";
+import type { Id } from "@convex/_generated/dataModel";
+import { GiftCanvas } from "@/components/GiftCanvas";
+import { VoiceRecorder } from "@/components/VoiceRecorder";
+import { registry } from "@/gifts/registry";
+import { MESSAGE_MAX, NAME_MAX, PAYLOAD_MAX, pick, defaultVariants } from "@/gifts/catalog";
+import { useArabicFontReady } from "@/gifts/useArabicFontReady";
+import { useLang, LangToggle } from "@/i18n";
+import NotFound from "@/components/NotFound";
 
 const inputClass =
   "w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-stone-100 placeholder:text-stone-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400";
@@ -19,11 +21,11 @@ const toLocalInput = (d: Date) =>
   new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 
 export default function Create() {
-  const { giftType } = useParams();
+  const { giftType } = useParams<{ giftType?: string }>();
   const def = giftType ? registry[giftType] : undefined;
   const createGift = useMutation(api.gifts.createGift);
   const generateVoiceUploadUrl = useMutation(api.gifts.generateVoiceUploadUrl);
-  const navigate = useNavigate();
+  const router = useRouter();
   const { lang, t } = useLang();
   const rtl = lang === "ar";
   // Gate the Arabic preview until Thmanyah loads so the one-time raster is branded.
@@ -84,7 +86,7 @@ export default function Create() {
         notifyEmail: notifyEmail.trim() || undefined,
         voiceId,
       });
-      navigate(`/sent/${statusKey}`);
+      router.push(`/sent/${statusKey}`);
     } catch {
       setError(t.create.error);
       setSubmitting(false);
@@ -99,7 +101,7 @@ export default function Create() {
     >
       <div className="flex items-center justify-between">
         <Link
-          to="/"
+          href="/"
           className="inline-flex w-fit items-center text-sm text-stone-400 underline-offset-4 transition hover:text-stone-200 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
         >
           {t.create.back}

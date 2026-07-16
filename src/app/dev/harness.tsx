@@ -1,16 +1,18 @@
+"use client";
 // Dev-only scene harness. The gallery and /create only ever render
 // phase="preview", so without this route the opening animations are
 // unobservable in a browser. Drives phase / lang / variants by hand, with no
-// Convex record behind it. main.tsx registers the route behind
-// import.meta.env.DEV, so this module never reaches a production build.
+// Convex record behind it. The route builds as its own chunk that no other
+// route ever loads, and the component 404s outside development.
 import { useState, type ReactNode } from "react";
-import { Link, useParams } from "react-router";
-import { GiftCanvas } from "../components/GiftCanvas";
-import { defaultVariants, pick } from "../gifts/catalog";
-import { registry } from "../gifts/registry";
-import type { GiftDef, GiftPhase } from "../gifts/types";
-import { useArabicFontReady } from "../gifts/useArabicFontReady";
-import type { Lang } from "../i18n";
+import Link from "next/link";
+import { useParams, notFound } from "next/navigation";
+import { GiftCanvas } from "@/components/GiftCanvas";
+import { defaultVariants, pick } from "@/gifts/catalog";
+import { registry } from "@/gifts/registry";
+import type { GiftDef, GiftPhase } from "@/gifts/types";
+import { useArabicFontReady } from "@/gifts/useArabicFontReady";
+import type { Lang } from "@/i18n";
 
 const PHASES: GiftPhase[] = ["preview", "sealed", "opening", "revealed"];
 const LANGS: Lang[] = ["en", "ar"];
@@ -159,7 +161,8 @@ function Harness({ def }: { def: GiftDef }) {
 }
 
 export default function Dev() {
-  const { giftType } = useParams();
+  if (process.env.NODE_ENV !== "development") notFound();
+  const { giftType } = useParams<{ giftType?: string }>();
   const def = giftType ? registry[giftType] : undefined;
 
   if (!def) {
@@ -172,7 +175,7 @@ export default function Dev() {
           {Object.keys(registry).map((id) => (
             <li key={id}>
               <Link
-                to={`/dev/${id}`}
+                href={`/dev/${id}`}
                 className="font-mono text-sm text-rose-400 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
               >
                 {id}

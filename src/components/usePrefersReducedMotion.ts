@@ -4,9 +4,13 @@ import { useSyncExternalStore } from "react";
 // just joins the subscriber set (React fans the change out), instead of every
 // instance registering its own DOM listener. Matters on the gallery, which
 // mounts a dozen canvases at once.
-const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+// Null during Next.js SSR module evaluation — the app tree itself only renders client-side.
+const mq =
+  typeof window !== "undefined"
+    ? window.matchMedia("(prefers-reduced-motion: reduce)")
+    : null;
 const subscribers = new Set<() => void>();
-mq.addEventListener("change", () => subscribers.forEach((fn) => fn()));
+mq?.addEventListener("change", () => subscribers.forEach((fn) => fn()));
 
 function subscribe(onChange: () => void) {
   subscribers.add(onChange);
@@ -16,5 +20,5 @@ function subscribe(onChange: () => void) {
 }
 
 export function usePrefersReducedMotion(): boolean {
-  return useSyncExternalStore(subscribe, () => mq.matches);
+  return useSyncExternalStore(subscribe, () => mq?.matches ?? false);
 }

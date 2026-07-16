@@ -1,15 +1,19 @@
+"use client";
 import { useState } from "react";
-import { Link, useParams } from "react-router";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import Loading from "../components/Loading";
-import { useLang } from "../i18n";
-import NotFound from "./NotFound";
+import { api } from "@convex/_generated/api";
+import Loading from "@/components/Loading";
+import { useLang } from "@/i18n";
+import NotFound from "@/components/NotFound";
 
-const canShare = "share" in navigator;
+// typeof guard: this module also evaluates during Next.js SSR, where older Node
+// runtimes have no `navigator` global. The app tree itself renders client-only.
+const canShare = typeof navigator !== "undefined" && "share" in navigator;
 
 export default function Sent() {
-  const { statusKey } = useParams();
+  const { statusKey } = useParams<{ statusKey?: string }>();
   const status = useQuery(
     api.gifts.getStatus,
     statusKey ? { statusKey } : "skip",
@@ -117,7 +121,7 @@ export default function Sent() {
       </div>
 
       <Link
-        to="/"
+        href="/"
         className="text-center text-sm text-stone-400 underline-offset-4 transition hover:text-stone-200 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
       >
         {t.sent.another}

@@ -12,9 +12,12 @@ import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
 // Shared visibility store: one "visibilitychange" listener fans out to every
 // canvas, instead of each gallery canvas registering its own.
 const visSubscribers = new Set<() => void>();
-document.addEventListener("visibilitychange", () =>
-  visSubscribers.forEach((fn) => fn()),
-);
+// Module also evaluates during Next.js SSR — the app tree itself only renders client-side.
+if (typeof document !== "undefined") {
+  document.addEventListener("visibilitychange", () =>
+    visSubscribers.forEach((fn) => fn()),
+  );
+}
 function useDocumentHidden(): boolean {
   return useSyncExternalStore(
     (onChange) => {

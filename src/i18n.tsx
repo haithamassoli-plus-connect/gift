@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components -- i18n module intentionally co-locates the dictionary, useLang hook, and Lang provider/toggle components. */
 import {
   createContext,
   useContext,

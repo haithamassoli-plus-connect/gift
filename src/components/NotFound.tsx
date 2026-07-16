@@ -1,5 +1,6 @@
-import { Link } from "react-router";
-import { Logo } from "../components/Logo";
+"use client";
+import Link from "next/link";
+import { Logo } from "./Logo";
 import { useLang } from "../i18n";
 
 export default function NotFound({
@@ -22,7 +23,7 @@ export default function NotFound({
       </h1>
       <p className="text-stone-400">{copy ?? t.notFound.copy}</p>
       <Link
-        to="/"
+        href="/"
         className="inline-flex min-h-[48px] items-center rounded-full bg-rose-500 px-6 font-medium text-white transition hover:bg-rose-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
       >
         {t.notFound.browse}

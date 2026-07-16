@@ -1,10 +1,11 @@
+"use client";
 import { useState } from "react";
-import { GiftPreviewCard } from "../components/GiftPreviewCard";
-import { Logo } from "../components/Logo";
-import { SiteCredit } from "../components/SiteCredit";
-import { registry } from "../gifts/registry";
-import { occasions, occasionsById, pick, type Occasion } from "../gifts/catalog";
-import { useLang, LangToggle } from "../i18n";
+import { GiftPreviewCard } from "@/components/GiftPreviewCard";
+import { Logo } from "@/components/Logo";
+import { SiteCredit } from "@/components/SiteCredit";
+import { registry } from "@/gifts/registry";
+import { occasions, occasionsById, pick, type Occasion } from "@/gifts/catalog";
+import { useLang, LangToggle } from "@/i18n";
 
 export default function Home() {
   const { lang, t } = useLang();

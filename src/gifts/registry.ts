@@ -46,7 +46,7 @@ export const registry: Record<string, GiftDef> = Object.fromEntries(
 );
 
 // Dev-only: an untagged scene drops out of every occasion filter (still in "All").
-if (import.meta.env.DEV) {
+if (process.env.NODE_ENV === "development") {
   const untagged = Object.keys(catalog).filter((id) => !occasionsById[id]?.length);
   if (untagged.length) console.warn(`[gifts] untagged scenes: ${untagged.join(", ")}`);
 }

@@ -1,14 +1,16 @@
+"use client";
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { GiftCanvas } from "../components/GiftCanvas";
-import { usePrefersReducedMotion } from "../components/usePrefersReducedMotion";
-import { registry } from "../gifts/registry";
-import { useArabicFontReady } from "../gifts/useArabicFontReady";
-import { strings, type Lang } from "../i18n";
-import Loading from "../components/Loading";
-import NotFound from "./NotFound";
+import { api } from "@convex/_generated/api";
+import { GiftCanvas } from "@/components/GiftCanvas";
+import { usePrefersReducedMotion } from "@/components/usePrefersReducedMotion";
+import { registry } from "@/gifts/registry";
+import { useArabicFontReady } from "@/gifts/useArabicFontReady";
+import { strings, type Lang } from "@/i18n";
+import Loading from "@/components/Loading";
+import NotFound from "@/components/NotFound";
 
 type Phase = "sealed" | "opening" | "revealed";
 
@@ -137,7 +139,7 @@ function RevealedMessage({
         </button>
       )}
       <Link
-        to="/"
+        href="/"
         className="mt-6 block text-sm text-stone-500 underline-offset-4 transition hover:text-stone-300 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
       >
         {sendBackLabel}
@@ -147,7 +149,7 @@ function RevealedMessage({
 }
 
 export default function GiftView() {
-  const { slug } = useParams();
+  const { slug } = useParams<{ slug?: string }>();
   const gift = useQuery(api.gifts.getGift, slug ? { slug } : "skip");
   const markOpened = useMutation(api.gifts.markOpened);
   const [phase, setPhase] = useState<Phase>("sealed");
